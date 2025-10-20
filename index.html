@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DURPLASS S.A.S. | Aberturas de PVC y Puertas de Chapa a Medida</title>
+    <!-- Carga de Tailwind CSS para un diseño moderno y responsive -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Paleta de Colores DURPLASS inspirada en el logo */
+        :root {
+            --color-primary-dark: #3A2A1A; /* Marrón Oscuro - Base del logo */
+            --color-accent-blue: #4A90E2; /* Azul - Ventanas/Acento */
+            --color-warm-gold: #A07A48; /* Dorado - Acento Cálido */
+            --color-bg-light: #F8F8F8; /* Fondo de Secciones */
+            --color-text-main: #222;
+            --color-white: #ffffff;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Estilos generales, scroll suave y corrección de espaciado de líneas */
+        html { scroll-behavior: smooth; }
+        body {
+            line-height: 1.6; /* Mejora la legibilidad general del texto */
+        }
+
+        /* Estilos del encabezado principal */
+        .header-bg {
+            background-color: var(--color-primary-dark);
+            box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.4); /* Más brillo y profundidad */
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        /* LOGO - Aseguramos un buen espaciado */
+        .logo {
+            letter-spacing: 0.15em; /* Aumenta el espaciado de las letras para que no se vean 'encimadas' */
+        }
+
+        /* Estilos de botones primarios */
+        .btn-primary {
+            background-color: var(--color-accent-blue);
+            color: var(--color-white);
+            transition: transform 0.2s, background-color 0.2s, box-shadow 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: #387ac9;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(74, 144, 226, 0.6); /* Efecto de brillo intenso */
+        }
+
+        /* Estilos del botón de cotización */
+        .btn-cotizar {
+            background-color: var(--color-warm-gold);
+            color: var(--color-primary-dark);
+            transition: background-color 0.2s, box-shadow 0.3s;
+        }
+
+        .btn-cotizar:hover {
+            background-color: #b08a5e;
+            box-shadow: 0 6px 15px rgba(160, 122, 72, 0.5); /* Efecto de brillo */
+        }
+
+        /* Hero Section - Banner principal */
+        .hero-section {
+            background-image: url('https://placehold.co/1920x600/F0EFEA/3A2A1A?text=Tu+Próxima+Obra');
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: multiply;
+            background-color: rgba(58, 42, 26, 0.75); /* Opacidad sobre la imagen - Aumentada */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8); /* Agrega más realismo y contraste al texto */
+        }
+        
+        /* Ajuste de título para mejor legibilidad */
+        .hero-section h1 {
+             line-height: 1.2;
+             font-weight: 800; /* Extra bold */
+        }
+
+        /* Estilos de tarjetas de producto */
+        .product-card {
+            transition: box-shadow 0.3s, transform 0.3s;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); /* Sombra inicial para realismo */
+        }
+
+        .product-card:hover {
+            box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.25), 0 8px 8px -4px rgba(0, 0, 0, 0.15); /* Sombra más profunda y brillante */
+            transform: translateY(-8px);
+        }
+
+        /* Estilos del botón flotante de WhatsApp */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            background-color: #25D366; /* Color de WhatsApp */
+            color: white;
+            padding: 18px; /* Tamaño un poco más grande */
+            border-radius: 50%;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s, background-color 0.3s;
+        }
+        .whatsapp-float:hover {
+            transform: scale(1.15) rotate(5deg); /* Efecto más dinámico */
+            background-color: #128C7E;
+        }
+
+        /* Estilos para el panel de administración */
+        .admin-panel {
+            background-color: #fff8e1; /* Fondo suave para destacarse */
+            border-bottom: 3px solid var(--color-warm-gold);
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-800">
+
+    <!-- BOTÓN FLOTANTE DE WHATSAPP (Ventas Ushuaia) -->
+    <!-- Número de Ushuaia: 2901514020. Usaremos el formato internacional +54 9 2901 514020 -->
+    <a href="https://wa.me/5492901514020" target="_blank" class="whatsapp-float" aria-label="WhatsApp de Ventas Ushuaia">
+        <!-- Icono de WhatsApp -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-whatsapp"><path d="M12.016 0c-6.627 0-12 5.373-12 12 0 2.228.608 4.312 1.705 6.13l-1.785 4.885 5.034-1.742a11.97 11.97 0 0 0 6.046 1.577c6.627 0 12-5.373 12-12s-5.373-12-12-12zm-2.022 17.5l-2.083-2.083c-.156-.156-.408-.156-.563 0l-1.785 1.785c-.156.156-.156.408 0 .563l3.75 3.75c.156.156.408.156.563 0l6.78-6.78c.156-.156.156-.408 0-.563l-1.785-1.785c-.156-.156-.408-.156-.563 0l-4.72 4.72z"/></svg>
+    </a>
+    
+    <!-- MENSAJE DE ESTADO (Para el formulario de cotización) -->
+    <div id="form-status" class="fixed top-0 left-0 right-0 p-4 text-center text-white font-bold hidden" style="z-index: 100; top: 70px;"></div>
+
+    <!-- 1. ENCABEZADO / NAVEGACIÓN (Sticky) -->
+    <header class="header-bg p-4 shadow-lg">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <!-- LOGO DURPLASS -->
+            <a href="#inicio" class="text-white text-3xl font-extrabold logo">
+                DURPLASS S.A.S.
+            </a>
+            
+            <!-- NAV BAR (Ocultar en móvil, mostrar en desktop) -->
+            <nav class="hidden md:flex space-x-6 items-center">
+                <a href="#inicio" class="text-white hover:text-gray-300 transition duration-150">Inicio</a>
+                <a href="#quienes-somos" class="text-white hover:text-gray-300 transition duration-150">Quiénes Somos</a>
+                <a href="#productos" class="text-white hover:text-gray-300 transition duration-150">Productos</a>
+                <a href="#proyectos" class="text-white hover:text-gray-300 transition duration-150">Proyectos</a>
+                <a href="#contacto" class="btn-cotizar py-2 px-4 rounded-lg text-sm font-semibold shadow-md">
+                    Cotizar Ahora
+                </a>
+            </nav>
+
+            <!-- Botón de Menú Móvil (Hamburguesa) - Implementación JS simple -->
+            <button id="menu-button" class="md:hidden text-white focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Menú Móvil Desplegable -->
+    <nav id="mobile-menu" class="header-bg md:hidden hidden fixed w-full z-40 shadow-xl">
+        <a href="#inicio" class="block py-3 px-4 text-white hover:bg-gray-700 border-b border-gray-700">Inicio</a>
+        <a href="#quienes-somos" class="block py-3 px-4 text-white hover:bg-gray-700 border-b border-gray-700">Quiénes Somos</a>
+        <a href="#productos" class="block py-3 px-4 text-white hover:bg-gray-700 border-b border-gray-700">Productos</a>
+        <a href="#proyectos" class="block py-3 px-4 text-white hover:bg-gray-700 border-b border-gray-700">Proyectos</a>
+        <a href="#contacto" class="block py-3 px-4 text-white hover:bg-gray-700 btn-cotizar">Cotizar Ahora</a>
+    </nav>
+
+    <!-- Panel de Administración de Contenido (Oculto para visitantes) -->
+    <section id="admin-panel" class="admin-panel py-8 hidden">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-lg" role="alert">
+                <p class="font-bold">MODO ADMINISTRADOR ACTIVO</p>
+                <p class="text-sm">Esta sección es para uso exclusivo del administrador de DURPLASS y NO es visible para los clientes.</p>
+            </div>
+
+            <h2 class="text-3xl font-bold mb-4" style="color: var(--color-primary-dark);">Gestor de Galería de Proyectos Simplificado</h2>
+            
+            <!-- INSTRUCCIONES SIMPLIFICADAS -->
+            <div class="bg-yellow-50 border-l-4 border-yellow-500 text-gray-800 p-4 mb-6 rounded-lg">
+                <p class="font-bold mb-2">Instrucciones de Carga Rápida:</p>
+                <p class="text-sm mb-3">1. Para usar una imagen que ya subiste a nuestra conversación, **copia el nombre exacto del archivo** de la lista de abajo y pégalo en el campo **'URL del Contenido'**.</p>
+                <p class="text-sm">2. Para videos o imágenes externas (como YouTube), pega el **enlace completo (URL)**.</p>
+            </div>
+            
+            <!-- LISTA DE ARCHIVOS SUBIDOS -->
+            <div class="mb-8">
+                <p class="font-semibold text-sm mb-2" style="color: var(--color-primary-dark);">Archivos subidos disponibles (copie el nombre):</p>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2 text-xs text-gray-700">
+                    <span class="bg-white p-2 rounded border border-gray-200 truncate">Captura de pantalla (80).png</span>
+                    <span class="bg-white p-2 rounded border border-gray-200 truncate">Captura de pantalla (81).jpg</span>
+                    <span class="bg-white p-2 rounded border border-gray-200 truncate">Captura de pantalla (82).png</span>
+                    <span class="bg-white p-2 rounded border border-gray-200 truncate">Captura de pantalla (83).png</span>
+                    <span class="bg-white p-2 rounded border border-gray-200 truncate">Captura de pantalla (84).png</span>
+                    <span class="bg-white p-2 rounded border border-gray-200 truncate">Captura de pantalla (85).png</span>
+                    <span class="bg-white p-2 rounded border border-gray-200 truncate">logo dur.jpg</span>
+                </div>
+            </div>
+
+
+            <form id="content-form" class="grid md:grid-cols-6 gap-4 items-end">
+                <div class="md:col-span-1">
+                    <label for="content-type" class="block text-sm font-medium text-gray-700">Tipo *</label>
+                    <select id="content-type" class="w-full p-2 border rounded-lg">
+                        <option value="Image">Imagen</option>
+                        <option value="Video">Video</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2">
+                    <label for="content-title" class="block text-sm font-medium text-gray-700">Título</label>
+                    <input type="text" id="content-title" placeholder="Ej: Ventana Patagónica" class="w-full p-2 border rounded-lg">
+                </div>
+                <div class="md:col-span-2">
+                    <label for="content-url" class="block text-sm font-medium text-gray-700">URL o Nombre de Archivo *</label>
+                    <input type="text" id="content-url" required placeholder="Ej: mi_archivo.jpg O https://link-a-youtube.com" class="w-full p-2 border rounded-lg">
+                </div>
+                <div class="md:col-span-1">
+                    <button type="submit" class="btn-primary w-full py-2.5 rounded-lg shadow-md">Agregar a Galería</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- 2. SECCIÓN PRINCIPAL / HERO -->
+    <section id="inicio" class="hero-section text-center py-24 md:py-40 text-white">
+        <div class="max-w-4xl mx-auto px-6">
+            <h1 class="text-5xl md:text-6xl font-extrabold mb-4 leading-tight shadow-md">
+                Soluciones a Medida: Aberturas de PVC y Puertas de Chapa
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 font-light">
+                Calidad certificada, fabricación propia y diseño que se integra perfectamente a tu proyecto.
+            </p>
+            <a href="#productos" class="btn-primary py-3 px-8 text-lg rounded-full shadow-lg hover:shadow-xl">
+                Ver Nuestro Catálogo
+            </a>
+        </div>
+    </section>
+
+    <!-- 3. QUIÉNES SOMOS -->
+    <section id="quienes-somos" class="py-20 bg-color-bg-light">
+        <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+            <div>
+                <h2 class="text-4xl font-bold mb-4 text-center md:text-left" style="color: var(--color-warm-gold);">Nuestra Historia, Nuestro Compromiso.</h2>
+                <h3 class="text-2xl font-semibold mb-6" style="color: var(--color-primary-dark);">DURPLASS S.A.S.: Calidad y Durabilidad.</h3>
+                <p class="mb-4 text-lg">
+                    Somos líderes en la fabricación de aberturas de PVC de alta prestación y puertas de chapa para la construcción. Desde nuestros inicios, nos hemos enfocado en la **innovación** y la **personalización**, asegurando que cada producto cumpla con las especificaciones exactas de nuestros clientes.
+                </p>
+                <ul class="list-disc list-inside space-y-2 text-md text-gray-600">
+                    <li>Fabricación 100% a medida.</li>
+                    <li>Materiales de alta eficiencia energética (DVH).</li>
+                    <li>Compromiso con la durabilidad y el diseño.</li>
+                </ul>
+                <a href="#contacto" class="btn-cotizar py-3 px-6 rounded-lg mt-8 inline-block shadow-lg">
+                    ¡Hablemos de tu Proyecto!
+                </a>
+            </div>
+            <!-- Placeholder para la imagen de la fábrica/oficina -->
+            <div class="rounded-xl overflow-hidden shadow-2xl">
+                 <img src="https://placehold.co/600x400/D9D9D9/3A2A1A?text=Fábrica+DURPLASS" alt="Imagen de la fábrica de DURPLASS" class="w-full h-auto object-cover">
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. PRODUCTOS Y SERVICIOS -->
+    <section id="productos" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-12" style="color: var(--color-primary-dark);">Líneas de Productos Principales</h2>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Tarjeta 1: Aberturas de PVC -->
+                <div class="product-card bg-color-bg-light p-6 rounded-xl shadow-lg border-t-4" style="border-color: var(--color-accent-blue);">
+                    <div class="text-4xl mb-4" style="color: var(--color-accent-blue);">
+                        <!-- Icono de Ventana (Lucide Icon) -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18M3 12h18"/></svg>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-3" style="color: var(--color-primary-dark);">Aberturas de PVC a Medida</h3>
+                    <p class="text-gray-600 mb-4">
+                        Ventanas y puertas balcón con máxima eficiencia térmica y acústica. Opción en Doble Vidrio Hermético (DVH) y múltiples terminaciones.
+                    </p>
+                    <a href="#contacto" class="text-sm font-semibold" style="color: var(--color-accent-blue);">Solicitar Ficha Técnica &rarr;</a>
+                </div>
+
+                <!-- Tarjeta 2: Puertas de Chapa -->
+                <div class="product-card bg-color-bg-light p-6 rounded-xl shadow-lg border-t-4" style="border-color: var(--color-warm-gold);">
+                    <div class="text-4xl mb-4" style="color: var(--color-warm-gold);">
+                        <!-- Icono de Puerta (Lucide Icon) -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto"><path d="M10 10l3 3m0 0l-3 3m3-3h-9M4 21v-4M20 21v-4"/></svg>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-3" style="color: var(--color-primary-dark);">Puertas de Seguridad y Chapa</h3>
+                    <p class="text-gray-600 mb-4">
+                        Máxima resistencia para exteriores e interiores. Diseños variados y refuerzos para la tranquilidad de tu hogar o empresa.
+                    </p>
+                    <a href="#contacto" class="text-sm font-semibold" style="color: var(--color-warm-gold);">Solicitar Catálogo &rarr;</a>
+                </div>
+
+                <!-- Tarjeta 3: Servicios e Instalación -->
+                <div class="product-card bg-color-bg-light p-6 rounded-xl shadow-lg border-t-4" style="border-color: var(--color-primary-dark);">
+                    <div class="text-4xl mb-4" style="color: var(--color-primary-dark);">
+                        <!-- Icono de Servicio (Lucide Icon) -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="15" y1="15" x2="9" y2="15"/></svg>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-3" style="color: var(--color-primary-dark);">Servicio de Asesoramiento</h3>
+                    <p class="text-gray-600 mb-4">
+                        Asesoramiento técnico y acompañamiento en obra. Garantía de instalación y servicio post-venta.
+                    </p>
+                    <a href="#contacto" class="text-sm font-semibold" style="color: var(--color-primary-dark);">Consultar Asesoría &rarr;</a>
+                </div>
+                
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. GALERÍA / PROYECTOS (Contenido Dinámico de Firestore) -->
+    <!-- Renombramos la ID y el título a "proyectos" para un enfoque más comercial -->
+    <section id="proyectos" class="py-20 bg-color-bg-light">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-4" style="color: var(--color-warm-gold);">Nuestros Proyectos en Obra y Muestras de Productos</h2>
+            <p class="text-center text-lg mb-10 text-gray-600">
+                Inspírate con nuestros trabajos. Aquí se mostrarán las imágenes y videos que cargamos para que veas la calidad DURPLASS.
+            </p>
+
+            <div id="gallery-container" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Los elementos de la galería se cargarán aquí dinámicamente desde Firestore -->
+                <p id="loading-message" class="col-span-3 text-center text-gray-500">Cargando galería...</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 6. CONTACTO / COTIZACIÓN (Formulario Funcional) -->
+    <section id="contacto" class="py-20 bg-white">
+        <div class="max-w-3xl mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-4" style="color: var(--color-primary-dark);">Solicita tu Cotización sin Cargo</h2>
+            <p class="text-center text-lg mb-10 text-gray-600">
+                Completa el formulario y un asesor técnico de DURPLASS se pondrá en contacto contigo a la brevedad.
+            </p>
+
+            <!-- 
+                IMPORTANTE: Este formulario usa el atributo data-netlify="true" para funcionar sin código de servidor.
+            -->
+            <form name="Cotizacion_DURPLASS" method="POST" data-netlify="true" class="space-y-6 bg-color-bg-light p-8 rounded-xl shadow-2xl" id="cotizacion-form">
+                <input type="hidden" name="form-name" value="Cotizacion_DURPLASS">
+                
+                <!-- Nombre y Apellido -->
+                <div>
+                    <label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre y Apellido *</label>
+                    <input type="text" id="nombre" name="nombre" required placeholder="Ej: Juan Pérez" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2" style="focus-ring-color: var(--color-accent-blue);">
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                    <input type="email" id="email" name="email" required placeholder="ejemplo@correo.com" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2" style="focus-ring-color: var(--color-accent-blue);">
+                </div>
+
+                <!-- Teléfono (WhatsApp) -->
+                <div>
+                    <label for="telefono" class="block text-sm font-medium text-gray-700 mb-1">Teléfono (WhatsApp) *</label>
+                    <input type="tel" id="telefono" name="telefono" required placeholder="Ej: +54 9 11 5555-5555" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2" style="focus-ring-color: var(--color-accent-blue);">
+                </div>
+
+                <!-- Tipo de Producto Interesado -->
+                <div>
+                    <label for="producto" class="block text-sm font-medium text-gray-700 mb-1">Producto de Interés *</label>
+                    <select id="producto" name="producto_interes" required class="w-full p-3 border border-gray-300 rounded-lg bg-white focus:ring-2" style="focus-ring-color: var(--color-accent-blue);">
+                        <option value="">Seleccione una opción</option>
+                        <option value="PVC">Aberturas de PVC a Medida</option>
+                        <option value="Chapa">Puertas de Chapa y Seguridad</option>
+                        <option value="Ambos">Ambos / Servicios de Asesoría</option>
+                    </select>
+                </div>
+
+                <!-- Descripción del Proyecto / Medidas -->
+                <div>
+                    <label for="mensaje" class="block text-sm font-medium text-gray-700 mb-1">Descripción del Proyecto (Medidas, Cantidad, Tipo)</label>
+                    <textarea id="mensaje" name="descripcion_proyecto" rows="4" placeholder="Ej: Necesito 5 ventanas corredizas de PVC, 1.20 x 1.00m con DVH y una puerta principal de chapa reforzada." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2" style="focus-ring-color: var(--color-accent-blue);"></textarea>
+                </div>
+
+                <!-- Botón de Envío -->
+                <div class="text-center">
+                    <input type="submit" value="Enviar Solicitud de Cotización" class="btn-primary py-3 px-8 rounded-full text-lg cursor-pointer hover:bg-opacity-90">
+                </div>
+            </form>
+
+        </div>
+    </section>
+    
+    <!-- 7. PIE DE PÁGINA -->
+    <footer class="bg-color-primary-dark text-white py-10">
+        <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-8">
+            
+            <!-- Columna 1: Logo y Eslogan -->
+            <div>
+                <h3 class="text-2xl font-extrabold mb-3 logo" style="color: var(--color-warm-gold);">DURPLASS</h3>
+                <p class="text-sm text-gray-300">Construyendo tu futuro con calidad y durabilidad.</p>
+            </div>
+
+            <!-- Columna 2: Enlaces Rápidos -->
+            <div>
+                <h4 class="text-lg font-semibold mb-3">Mapa del Sitio</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#inicio" class="hover:text-gray-300">Inicio</a></li>
+                    <li><a href="#quienes-somos" class="hover:text-gray-300">Quiénes Somos</a></li>
+                    <li><a href="#productos" class="hover:text-gray-300">Productos</a></li>
+                    <li><a href="#proyectos" class="hover:text-gray-300">Proyectos</a></li>
+                </ul>
+            </div>
+
+            <!-- Columna 3: Contacto (Números y ubicaciones - DESTACADO) -->
+            <div class="md:col-span-2">
+                <h4 class="text-xl font-extrabold mb-4" style="color: var(--color-accent-blue);">Contacto DURPLASS S.A.S.</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="bg-gray-800 p-4 rounded-lg shadow-inner">
+                        <p class="font-bold text-lg" style="color: var(--color-warm-gold);">Punto de Ventas (Tierra del Fuego)</p>
+                        <p class="text-2xl font-bold mt-1 text-white">
+                            <!-- Enlace telefónico directo -->
+                            <a href="tel:2901514020" class="hover:text-gray-300 underline block">2901-514020</a>
+                        </p>
+                        <p class="text-sm text-gray-400">Atención a clientes y presupuestos en Ushuaia.</p>
+                    </div>
+                    
+                    <div class="bg-gray-800 p-4 rounded-lg shadow-inner">
+                        <p class="font-bold text-lg" style="color: var(--color-warm-gold);">Fábrica y Administración (Buenos Aires)</p>
+                        <p class="text-2xl font-bold mt-1 text-white">
+                            <!-- Enlace telefónico directo con prefijo 011 -->
+                            <a href="tel:01150950613" class="hover:text-gray-300 underline block">011-5095-0613</a>
+                        </p>
+                        <p class="text-sm text-gray-400">Oficina central y gestión administrativa.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna 4 (Original): Redes Sociales (Movida a columna 3) -->
+            
+        </div>
+        
+        <div class="text-center mt-8 pt-4 border-t border-gray-700">
+             <div class="flex justify-center space-x-4 mb-4">
+                <!-- Icono de WhatsApp con enlace de TDF -->
+                <a href="https://wa.me/5492901514020" target="_blank" class="text-3xl hover:text-green-500 transition duration-150" aria-label="WhatsApp Ushuaia">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 11l5 5l5-5"/><path d="M12 16V3"/></svg>
+                </a>
+                <!-- Icono de Instagram -->
+                <a href="#" target="_blank" class="text-3xl hover:text-pink-500 transition duration-150">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12 8a4 4 0 0 1 4 3.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                </a>
+                <!-- Icono de Facebook -->
+                <a href="#" target="_blank" class="text-3xl hover:text-blue-500 transition duration-150">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                </a>
+            </div>
+            <p class="text-sm">&copy; 2025 DURPLASS S.A.S. Todos los derechos reservados. | Diseñado para el éxito.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript y Lógica de Firestore -->
+    <script type="module">
+        // Global variables for Firebase environment (provided by the Canvas)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, addDoc, onSnapshot, collection, query, serverTimestamp, setLogLevel, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase instances
+        let app = null;
+        let db = null;
+        let auth = null;
+        let userId = null;
+        let isAuthReady = false;
+
+        setLogLevel('Debug'); // Enable Firestore logging
+
+        // --- FIREBASE INITIALIZATION AND AUTHENTICATION ---
+        async function initializeFirebase() {
+            if (!firebaseConfig) {
+                console.error("Firebase configuration not found.");
+                return;
+            }
+
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+            
+            // Set persistence to session to maintain login across tab refresh
+            await setPersistence(auth, browserSessionPersistence);
+
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    userId = user.uid;
+                    isAuthReady = true;
+                    console.log("User authenticated:", userId);
+                    // IMPORTANTE: Solo muestra el panel de administración al usuario autenticado
+                    // Para simular la vista del cliente, comenta la siguiente línea y recarga la vista.
+                    document.getElementById('admin-panel').classList.remove('hidden'); 
+                    setupGalleryListener();
+                } else {
+                    // Intenta iniciar sesión con el token personalizado o de forma anónima
+                    if (initialAuthToken) {
+                        try {
+                            await signInWithCustomToken(auth, initialAuthToken);
+                        } catch (error) {
+                            console.error("Custom token sign-in failed, falling back to anonymous:", error);
+                            await signInAnonymously(auth);
+                        }
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                    // Aunque no tenga un token, inicia el listener para que los clientes vean la galería (vacía o no).
+                    setupGalleryListener(); 
+                }
+            });
+        }
+
+        // --- GALLERY MANAGEMENT FUNCTIONS ---
+        // La ruta de la galería usa el ID del usuario, asegurando que solo el dueño pueda escribir.
+        const galleryCollectionPath = () => `/artifacts/${appId}/users/${userId}/product_gallery`;
+
+        // 1. Setup Real-time Listener for Gallery
+        function setupGalleryListener() {
+            if (!db) return;
+
+            // Se usa el userId que se obtuvo en onAuthStateChanged. 
+            // Si el usuario es anónimo o no-admin, la galería estará vacía hasta que se carguen datos.
+            // Para la seguridad de la escritura, la regla de Firestore debe restringir la escritura solo al userId.
+            const q = query(collection(db, galleryCollectionPath()), orderBy("createdAt", "desc"));
+
+            onSnapshot(q, (snapshot) => {
+                const galleryContainer = document.getElementById('gallery-container');
+                const loadingMessage = document.getElementById('loading-message');
+                const galleryItems = [];
+
+                snapshot.docs.forEach(doc => {
+                    const item = doc.data();
+                    galleryItems.push(renderGalleryItem(item));
+                });
+
+                if (galleryItems.length > 0) {
+                    galleryContainer.innerHTML = galleryItems.join('');
+                    loadingMessage.classList.add('hidden');
+                } else {
+                    galleryContainer.innerHTML = `<p class="col-span-3 text-center text-gray-500 py-10">Actualmente no hay proyectos o muestras cargadas. Vuelve pronto para ver nuestras novedades.</p>`;
+                    loadingMessage.classList.add('hidden');
+                }
+            }, (error) => {
+                console.error("Error fetching gallery data:", error);
+                document.getElementById('gallery-container').innerHTML = `<p class="col-span-3 text-center text-red-500">Error al cargar la galería. Por favor, revisa la consola para más detalles.</p>`;
+            });
+        }
+
+        // 2. Render a single gallery item based on type (Image/Video)
+        function renderGalleryItem(item) {
+            const title = item.title || (item.type === 'Video' ? 'Video del Producto' : 'Imagen del Producto');
+            
+            let mediaHtml = '';
+            let mediaUrl = item.url;
+
+            // Simple check to determine if it's a relative path (i.e., a file name provided by the user)
+            // If it doesn't start with http, https, or data:, assume it's a file provided to the environment.
+            if (!mediaUrl.startsWith('http') && !mediaUrl.startsWith('data:')) {
+                // IMPORTANT: When a user provides a file name, the runner environment handles the content fetching.
+                // We use the file name as the path, relying on the environment to resolve it.
+                // The runner environment automatically handles the image path when a simple file name is used.
+                // Example: 'logo dur.jpg' is used directly as the src.
+                console.log(`Assuming local file path: ${mediaUrl}`);
+            }
+
+
+            if (item.type === 'Image') {
+                mediaHtml = `<img src="${mediaUrl}" alt="${title}" class="w-full h-64 object-cover">`;
+            } else if (item.type === 'Video' && mediaUrl.includes('youtube.com/embed')) {
+                // Assuming YouTube embed URL for easy iframe support
+                mediaHtml = `
+                    <iframe 
+                        class="w-full h-64"
+                        src="${mediaUrl}" 
+                        title="${title}" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen
+                    ></iframe>`;
+            } else if (item.type === 'Video') {
+                 // For generic video URLs, use <video> tag
+                mediaHtml = `
+                    <video controls class="w-full h-64 object-cover">
+                        <source src="${mediaUrl}" type="video/mp4">
+                        Tu navegador no soporta el tag de video.
+                    </video>`;
+            }
+
+            // Fallback para fecha si no existe (aunque serverTimestamp lo debe generar)
+            const dateString = item.createdAt ? new Date(item.createdAt.toDate()).toLocaleDateString() : 'Fecha Desconocida';
+
+            return `
+                <div class="rounded-lg overflow-hidden shadow-xl product-card hover:shadow-2xl">
+                    <div class="h-64 relative bg-gray-200">${mediaHtml}</div>
+                    <div class="p-4 bg-white">
+                        <h4 class="text-lg font-semibold" style="color: var(--color-primary-dark);">${title}</h4>
+                        <p class="text-sm text-gray-500">${item.type} | Proyecto: ${dateString}</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // 3. Handle Form Submission for adding new content (ADMIN ONLY)
+        document.getElementById('content-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            if (!db || !userId || document.getElementById('admin-panel').classList.contains('hidden')) {
+                // No hacemos nada si no es admin y si firebase no está listo
+                 return;
+            }
+
+            const title = document.getElementById('content-title').value.trim() || null;
+            const type = document.getElementById('content-type').value;
+            const url = document.getElementById('content-url').value.trim();
+
+            if (!url) {
+                showMessage("La URL o el Nombre de Archivo del contenido es obligatorio.", 'bg-red-500');
+                return;
+            }
+
+            const newArtifact = {
+                title: title,
+                type: type,
+                url: url,
+                createdAt: serverTimestamp() 
+            };
+            
+            showMessage("Agregando contenido a la galería...", 'bg-yellow-500');
+
+            try {
+                // Retry logic for API call (Exponential Backoff)
+                const maxRetries = 3;
+                let lastError = null;
+
+                for (let i = 0; i < maxRetries; i++) {
+                    try {
+                        const colRef = collection(db, galleryCollectionPath());
+                        await addDoc(colRef, newArtifact);
+                        showMessage("¡Contenido agregado con éxito! Recuerda que puede tardar unos segundos en cargar.", 'bg-green-500');
+                        e.target.reset(); // Reset form on success
+                        lastError = null; // Clear error on success
+                        break;
+                    } catch (error) {
+                        lastError = error;
+                        const delay = Math.pow(2, i) * 1000; // 1s, 2s, 4s
+                        if (i < maxRetries - 1) {
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                        }
+                    }
+                }
+
+                if (lastError) {
+                    console.error("Failed to add document after retries:", lastError);
+                    showMessage("Error: No se pudo agregar el contenido a la base de datos.", 'bg-red-500');
+                }
+
+            } catch (error) {
+                console.error("Error general al añadir documento:", error);
+                showMessage("Error desconocido al guardar. Revisa la consola.", 'bg-red-500');
+            }
+        });
+
+
+        // --- UTILITY FUNCTIONS ---
+        function showMessage(message, className) {
+            const statusMessage = document.getElementById('form-status');
+            
+            // FIX: Comprobación para evitar TypeError si el elemento es null
+            if (!statusMessage) {
+                console.error("DOM element 'form-status' not found. Skipping message display.");
+                return;
+            }
+
+            statusMessage.classList.remove('hidden', 'bg-red-500', 'bg-green-500', 'bg-yellow-500');
+            statusMessage.classList.add(className);
+            statusMessage.textContent = message;
+            
+            setTimeout(() => {
+                statusMessage.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Script para manejar el envío del formulario de cotización (NETLIFY)
+        document.getElementById('cotizacion-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const statusMessage = document.getElementById('form-status');
+            
+            // FIX: Comprobación para evitar TypeError si el elemento es null
+            if (!statusMessage) {
+                console.error("DOM element 'form-status' not found in cotizacion-form handler. Cannot display status.");
+                return;
+            }
+
+            statusMessage.classList.remove('hidden', 'bg-red-500', 'bg-green-500');
+            statusMessage.classList.add('bg-yellow-500');
+            statusMessage.textContent = 'Enviando solicitud de cotización...';
+            
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: new URLSearchParams(new FormData(form)).toString(),
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                });
+
+                if (response.ok) {
+                    statusMessage.classList.remove('bg-yellow-500');
+                    statusMessage.classList.add('bg-green-500');
+                    statusMessage.textContent = '¡Cotización enviada con éxito! Pronto nos pondremos en contacto contigo.';
+                    form.reset();
+                } else {
+                    throw new Error('Error en el servidor de formularios Netlify.');
+                }
+            } catch (error) {
+                console.error('Error al enviar el formulario de cotización:', error);
+                statusMessage.classList.remove('bg-yellow-500');
+                statusMessage.classList.add('bg-red-500');
+                statusMessage.textContent = 'Error al enviar la solicitud. Por favor, inténtalo de nuevo o contáctanos por teléfono.';
+            }
+
+            setTimeout(() => {
+                statusMessage.classList.add('hidden');
+            }, 5000);
+        });
+
+        // Toggle mobile menu visibility
+        document.getElementById('menu-button').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Hide mobile menu when a link is clicked
+        document.querySelectorAll('#mobile-menu a').forEach(item => {
+            item.addEventListener('click', () => {
+                document.getElementById('mobile-menu').classList.add('hidden');
+            });
+        });
+
+
+        // Start initialization when the window loads
+        window.onload = initializeFirebase;
+    </script>
+</body>
+</html>
