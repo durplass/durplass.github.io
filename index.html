@@ -121,7 +121,6 @@
 <body class="bg-white text-gray-800">
 
     <!-- BOTÓN FLOTANTE DE WHATSAPP (Ventas Ushuaia) -->
-    <!-- Número de Ushuaia: 2901514020. Usaremos el formato internacional +54 9 2901 514020 -->
     <a href="https://wa.me/5492901514020" target="_blank" class="whatsapp-float" aria-label="WhatsApp de Ventas Ushuaia">
         <!-- Icono de WhatsApp -->
         <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-whatsapp"><path d="M12.016 0c-6.627 0-12 5.373-12 12 0 2.228.608 4.312 1.705 6.13l-1.785 4.885 5.034-1.742a11.97 11.97 0 0 0 6.046 1.577c6.627 0 12-5.373 12-12s-5.373-12-12-12zm-2.022 17.5l-2.083-2.083c-.156-.156-.408-.156-.563 0l-1.785 1.785c-.156.156-.156.408 0 .563l3.75 3.75c.156.156.408.156.563 0l6.78-6.78c.156-.156.156-.408 0-.563l-1.785-1.785c-.156-.156-.408-.156-.563 0l-4.72 4.72z"/></svg>
@@ -193,6 +192,15 @@
                     <span class="bg-white p-2 rounded border border-gray-200 truncate">Captura de pantalla (84).png</span>
                     <span class="bg-white p-2 rounded border border-gray-200 truncate">Captura de pantalla (85).png</span>
                     <span class="bg-white p-2 rounded border border-gray-200 truncate">logo dur.jpg</span>
+                    <!-- Agregamos los archivos más recientes -->
+                    <span class="bg-white p-2 rounded border border-gray-200 truncate">Captura de pantalla (114).png</span>
+                    <span class="bg-white p-2 rounded border border-gray-200 truncate">Captura de pantalla (115).png</span>
+                    <span class="bg-white p-2 rounded border border-gray-200 truncate">Captura de pantalla (116).png</span>
+                    <span class="bg-white p-2 rounded border border-gray-200 truncate">Captura de pantalla (117).png</span>
+                    <span class="bg-white p-2 rounded border border-gray-200 truncate">Captura de pantalla (118).png</span>
+                    <span class="bg-white p-2 rounded border border-gray-200 truncate">Captura de pantalla (122).png</span>
+                    <span class="bg-white p-2 rounded border border-gray-200 truncate">Captura de pantalla (123).png</span>
+                    <span class="bg-white p-2 rounded border border-gray-200 truncate">Captura de pantalla (124).jpg</span>
                 </div>
             </div>
 
@@ -311,7 +319,6 @@
     </section>
 
     <!-- 5. GALERÍA / PROYECTOS (Contenido Dinámico de Firestore) -->
-    <!-- Renombramos la ID y el título a "proyectos" para un enfoque más comercial -->
     <section id="proyectos" class="py-20 bg-color-bg-light">
         <div class="max-w-7xl mx-auto px-6">
             <h2 class="text-4xl font-bold text-center mb-4" style="color: var(--color-warm-gold);">Nuestros Proyectos en Obra y Muestras de Productos</h2>
@@ -333,13 +340,37 @@
             <p class="text-center text-lg mb-10 text-gray-600">
                 Completa el formulario y un asesor técnico de DURPLASS se pondrá en contacto contigo a la brevedad.
             </p>
+            
+            <!-- FORMULARIO OCULTO PARA DETECCIÓN DE NETLIFY - INICIO -->
+            <!-- Este formulario garantiza que Netlify cree el endpoint del formulario. -->
+            <form name="Cotizacion_DURPLASS" method="POST" data-netlify="true" hidden>
+                <input type="text" name="nombre">
+                <input type="email" name="email">
+                <input type="tel" name="telefono">
+                <select name="producto_interes"></select>
+                <textarea name="descripcion_proyecto"></textarea>
+            </form>
+            <!-- FORMULARIO OCULTO PARA DETECCIÓN DE NETLIFY - FIN -->
 
-            <!-- 
-                IMPORTANTE: Este formulario usa el atributo data-netlify="true" para funcionar sin código de servidor.
-            -->
-            <form name="Cotizacion_DURPLASS" method="POST" data-netlify="true" class="space-y-6 bg-color-bg-light p-8 rounded-xl shadow-2xl" id="cotizacion-form">
+
+            <!-- FORMULARIO VISIBLE REAL -->
+            <!-- Usamos netlify-honeypot para anti-spam y el atributo netlify para apuntar al formulario real. -->
+            <form 
+                name="cotizacion-visible" 
+                method="POST" 
+                netlify-honeypot="bot-field" 
+                data-netlify="true" 
+                netlify="Cotizacion_DURPLASS" 
+                class="space-y-6 bg-color-bg-light p-8 rounded-xl shadow-2xl" 
+                id="cotizacion-form"
+            >
                 <input type="hidden" name="form-name" value="Cotizacion_DURPLASS">
                 
+                <!-- Campo Honeypot para anti-spam (oculto por CSS) -->
+                <p class="hidden">
+                    <label>No rellenar: <input name="bot-field" /></label>
+                </p>
+
                 <!-- Nombre y Apellido -->
                 <div>
                     <label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre y Apellido *</label>
@@ -487,13 +518,18 @@
             await setPersistence(auth, browserSessionPersistence);
 
             onAuthStateChanged(auth, async (user) => {
+                const adminPanel = document.getElementById('admin-panel'); // Obtener referencia aquí
+
                 if (user) {
                     userId = user.uid;
                     isAuthReady = true;
                     console.log("User authenticated:", userId);
-                    // IMPORTANTE: Solo muestra el panel de administración al usuario autenticado
-                    // Para simular la vista del cliente, comenta la siguiente línea y recarga la vista.
-                    document.getElementById('admin-panel').classList.remove('hidden'); 
+                    
+                    // CORRECCIÓN 1: Verificar la existencia del elemento antes de manipularlo
+                    if (adminPanel) {
+                        adminPanel.classList.remove('hidden'); 
+                    }
+                    
                     setupGalleryListener();
                 } else {
                     // Intenta iniciar sesión con el token personalizado o de forma anónima
@@ -521,14 +557,18 @@
         function setupGalleryListener() {
             if (!db) return;
 
-            // Se usa el userId que se obtuvo en onAuthStateChanged. 
-            // Si el usuario es anónimo o no-admin, la galería estará vacía hasta que se carguen datos.
-            // Para la seguridad de la escritura, la regla de Firestore debe restringir la escritura solo al userId.
             const q = query(collection(db, galleryCollectionPath()), orderBy("createdAt", "desc"));
 
             onSnapshot(q, (snapshot) => {
                 const galleryContainer = document.getElementById('gallery-container');
                 const loadingMessage = document.getElementById('loading-message');
+
+                // CORRECCIÓN 2: Aseguramos que ambos elementos existan antes de manipularlos.
+                if (!galleryContainer || !loadingMessage) {
+                    console.error("DOM elements for gallery not found during snapshot update.");
+                    return;
+                }
+                
                 const galleryItems = [];
 
                 snapshot.docs.forEach(doc => {
@@ -607,8 +647,10 @@
         document.getElementById('content-form').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            if (!db || !userId || document.getElementById('admin-panel').classList.contains('hidden')) {
-                // No hacemos nada si no es admin y si firebase no está listo
+            // Verificar si el panel de administración está visible para asegurar que sea un intento legítimo
+            const adminPanel = document.getElementById('admin-panel');
+            if (!db || !userId || (adminPanel && adminPanel.classList.contains('hidden'))) {
+                 showMessage("Error de Permisos: Solo el administrador puede agregar contenido.", 'bg-red-500');
                  return;
             }
 
@@ -683,61 +725,17 @@
             }, 5000);
         }
 
-        // Script para manejar el envío del formulario de cotización (NETLIFY)
-        document.getElementById('cotizacion-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const form = e.target;
-            const statusMessage = document.getElementById('form-status');
-            
-            // FIX: Comprobación para evitar TypeError si el elemento es null
-            if (!statusMessage) {
-                console.error("DOM element 'form-status' not found in cotizacion-form handler. Cannot display status.");
-                return;
-            }
-
-            statusMessage.classList.remove('hidden', 'bg-red-500', 'bg-green-500');
-            statusMessage.classList.add('bg-yellow-500');
-            statusMessage.textContent = 'Enviando solicitud de cotización...';
-            
-            try {
-                const response = await fetch(form.action, {
-                    method: 'POST',
-                    body: new URLSearchParams(new FormData(form)).toString(),
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    }
-                });
-
-                if (response.ok) {
-                    statusMessage.classList.remove('bg-yellow-500');
-                    statusMessage.classList.add('bg-green-500');
-                    statusMessage.textContent = '¡Cotización enviada con éxito! Pronto nos pondremos en contacto contigo.';
-                    form.reset();
-                } else {
-                    throw new Error('Error en el servidor de formularios Netlify.');
-                }
-            } catch (error) {
-                console.error('Error al enviar el formulario de cotización:', error);
-                statusMessage.classList.remove('bg-yellow-500');
-                statusMessage.classList.add('bg-red-500');
-                statusMessage.textContent = 'Error al enviar la solicitud. Por favor, inténtalo de nuevo o contáctanos por teléfono.';
-            }
-
-            setTimeout(() => {
-                statusMessage.classList.add('hidden');
-            }, 5000);
-        });
-
         // Toggle mobile menu visibility
         document.getElementById('menu-button').addEventListener('click', function() {
             const mobileMenu = document.getElementById('mobile-menu');
-            mobileMenu.classList.toggle('hidden');
+            if(mobileMenu) mobileMenu.classList.toggle('hidden');
         });
 
         // Hide mobile menu when a link is clicked
         document.querySelectorAll('#mobile-menu a').forEach(item => {
             item.addEventListener('click', () => {
-                document.getElementById('mobile-menu').classList.add('hidden');
+                const mobileMenu = document.getElementById('mobile-menu');
+                if(mobileMenu) mobileMenu.classList.add('hidden');
             });
         });
 
