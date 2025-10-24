@@ -6,10 +6,163 @@
     <title>DURPLASS S.A.S. | Aberturas de PVC y Puertas de Chapa a Medida</title>
     <!-- Carga de Tailwind CSS para un diseño moderno y responsive -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Carga de íconos Lucide para una interfaz moderna -->
+    <script type="module">
+      import { createIcons, Mail, Phone, MapPin, Menu, X, Factory, DollarSign, Target, Home } from 'https://cdn.jsdelivr.net/npm/lucide-esm@latest';
+      createIcons({ icons: { Mail, Phone, MapPin, Menu, X, Factory, DollarSign, Target, Home } });
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     
+    <!-- Importaciones de Firebase (Firestore y Auth) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Globales para Firebase (Serán inicializadas en initializeFirebase)
+        let db;
+        let auth;
+        let userId = 'anonymous';
+
+        // Constantes del entorno (MANDATORIO)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        /**
+         * Inicializa Firebase, autentica al usuario (con token o anónimamente)
+         * y establece el ID de usuario.
+         */
+        async function initializeFirebase() {
+            try {
+                if (Object.keys(firebaseConfig).length === 0) {
+                    console.warn("Firebase config is empty. Firestore will not be functional.");
+                    return;
+                }
+                
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                userId = auth.currentUser ? auth.currentUser.uid : crypto.randomUUID();
+                console.log("Firebase initialized. User ID:", userId);
+
+            } catch (error) {
+                console.error("Error al inicializar Firebase o autenticar:", error);
+                showMessage(`Error de conexión: ${error.message}`, 'bg-red-500');
+            }
+        }
+
+        /**
+         * Muestra un mensaje de estado al usuario.
+         * @param {string} message - El mensaje a mostrar.
+         * @param {string} className - Clase de Tailwind para el color (e.g., 'bg-green-500').
+         */
+        function showMessage(message, className) {
+            const statusMessage = document.getElementById('form-status');
+            if (!statusMessage) {
+                console.error("DOM element 'form-status' not found. Skipping message display.");
+                return;
+            }
+
+            statusMessage.classList.remove('hidden', 'bg-red-500', 'bg-green-500', 'bg-yellow-500');
+            statusMessage.classList.add(className);
+            statusMessage.textContent = message;
+            
+            setTimeout(() => {
+                statusMessage.classList.add('hidden');
+            }, 6000);
+        }
+
+        /**
+         * Maneja el envío del formulario y guarda la solicitud en Firestore.
+         */
+        window.saveBudgetRequest = async function(event) {
+            event.preventDefault();
+            
+            if (!db) {
+                showMessage('Error: La base de datos no está inicializada. Intente recargar.', 'bg-red-500');
+                return;
+            }
+
+            const form = document.getElementById('budget-form');
+            if (!form.checkValidity()) {
+                showMessage('Por favor, complete todos los campos obligatorios correctamente.', 'bg-yellow-500');
+                form.reportValidity(); // Muestra mensajes de error del navegador
+                return;
+            }
+
+            const formData = new FormData(form);
+            const data = {};
+            formData.forEach((value, key) => data[key] = value);
+
+            // Preparar el documento para Firestore
+            const requestData = {
+                timestamp: serverTimestamp(),
+                userId: userId,
+                status: 'Pendiente',
+                ...data,
+                // Agregado de campos específicos del formulario detallado
+                tipoObra: data['tipo-obra'],
+                tipoCliente: data['tipo-cliente'],
+                productoPrincipal: data['producto-principal'],
+                cantidadEstimada: parseInt(data['cantidad-estimada'], 10) || 0,
+                colorPerfil: data['color-perfil'],
+                tipoVidrio: data['tipo-vidrio'],
+                detallesAdicionales: data['detalles-adicionales'],
+                // Datos de contacto
+                nombre: data.nombre,
+                email: data.email,
+                telefono: data.telefono,
+                localidad: data.localidad,
+            };
+
+            try {
+                // Ruta para datos privados del usuario: /artifacts/{appId}/users/{userId}/budget_requests
+                const userRef = doc(db, 'artifacts', appId, 'users', userId);
+                const collectionRef = collection(userRef, 'budget_requests');
+                
+                await addDoc(collectionRef, requestData);
+
+                showMessage('¡Solicitud de presupuesto enviada con éxito! Nos pondremos en contacto pronto.', 'bg-green-500');
+                form.reset(); // Limpia el formulario
+            } catch (error) {
+                console.error("Error al guardar la solicitud en Firestore: ", error);
+                showMessage(`Error al enviar la solicitud: ${error.message}`, 'bg-red-500');
+            }
+        }
+
+        // Toggle mobile menu visibility
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuButton = document.getElementById('menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            if(menuButton && mobileMenu) {
+                menuButton.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+
+            // Hide mobile menu when a link is clicked
+            document.querySelectorAll('#mobile-menu a, .main-nav a').forEach(item => {
+                item.addEventListener('click', () => {
+                    if(mobileMenu) mobileMenu.classList.add('hidden');
+                });
+            });
+
+             // Aplicar la función al cargar la ventana
+            initializeFirebase();
+        });
+    </script>
+    
     <style>
-        /* Paleta de Colores DURPLASS inspirada en el logo */
+        /* Paleta de Colores DURPLASS inspirada en el logo (Marrón, Azul, Dorado) */
         :root {
             --color-primary-dark: #3A2A1A; /* Marrón Oscuro - Base del logo */
             --color-accent-blue: #4A90E2; /* Azul - Ventanas/Acento */
@@ -22,294 +175,347 @@
 
         /* Estilos generales, scroll suave y corrección de espaciado de líneas */
         html { scroll-behavior: smooth; }
-        body { background-color: var(--color-white); color: var(--color-text-main); }
-        .bg-primary-dark { background-color: var(--color-primary-dark); }
-        .text-accent-blue { color: var(--color-accent-blue); }
-        .bg-accent-blue { background-color: var(--color-accent-blue); }
-        .bg-warm-gold { background-color: var(--color-warm-gold); }
-        .hover\:bg-warm-gold:hover { background-color: var(--color-warm-gold); }
-        .bg-section-light { background-color: var(--color-bg-light); }
+        body { color: var(--color-text-main); }
 
-        /* HERO Section Background with Placeholder */
-        .hero-bg {
-            background-image: url('https://placehold.co/1920x800/3A2A1A/A07A48?text=FOTO+DE+FACHADA+MODERNA');
+        /* Estilo para los botones principales (Moderno y con Sombra) */
+        .btn-primary {
+            background-color: var(--color-accent-blue);
+            color: var(--color-white);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+        }
+        .btn-primary:hover {
+            background-color: #387ac9; /* Un tono más oscuro */
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Estilo para el Hero Section (Fondo con imagen y overlay) */
+        #inicio {
+            background-image: url('https://placehold.co/1920x800/3A2A1A/ffffff?text=DURPLASS+PVC+y+Chapa');
             background-size: cover;
             background-position: center;
-            background-attachment: fixed; /* Efecto Parallax */
+            position: relative;
         }
+        #inicio::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5); /* Oscurecer ligeramente para que el texto resalte */
+            z-index: 1;
+        }
+        #inicio > * { z-index: 2; position: relative; }
+        
+        /* Estilos específicos para el formulario */
+        .form-group > label {
+            font-weight: 600;
+            color: var(--color-primary-dark);
+            margin-bottom: 0.25rem;
+            display: block;
+        }
+        .form-group input:not([type='radio']):not([type='checkbox']), 
+        .form-group select, 
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+        .form-group input:focus, 
+        .form-group select:focus, 
+        .form-group textarea:focus {
+            border-color: var(--color-accent-blue);
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+            outline: none;
+        }
+
     </style>
 </head>
+<body class="bg-white">
 
-<body>
-    <!-- Encabezado Fijo -->
-    <header class="bg-primary-dark fixed w-full z-10 shadow-lg text-white">
+    <!-- Navbar/Header Fijo (Responsive) -->
+    <header class="sticky top-0 z-50 bg-white shadow-lg">
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
-                <!-- Logo y Nombre -->
-                <div class="flex-shrink-0">
-                    <a href="#hero" class="flex items-center space-x-2">
-                        <img class="h-10 w-auto rounded-full" src="https://placehold.co/40x40/A07A48/3A2A1A?text=DUR" alt="Logo DURPLASS">
-                        <span class="text-xl font-extrabold tracking-tight text-white hidden sm:block">DURPLASS S.A.S.</span>
-                    </a>
-                </div>
+                <!-- Logo de la Empresa (Se asume un logo con texto DURPLASS) -->
+                <a href="#inicio" class="text-2xl font-extrabold text-gray-900 tracking-wider">
+                    DURPLASS <span class="text-lg font-light text-[var(--color-accent-blue)]">S.A.S.</span>
+                </a>
                 
-                <!-- Menú Principal (Desktop) -->
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-4">
-                        <a href="#hero" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-warm-gold transition duration-200">Inicio</a>
-                        <a href="#products" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-warm-gold transition duration-200">Productos</a>
-                        <!-- ENLACE A ARCHIVO EXTERNO -->
-                        <a href="presupuesto.html" class="px-3 py-2 rounded-md text-sm font-medium bg-accent-blue text-white hover:bg-warm-gold transition duration-200">Presupuesto</a>
-                        <a href="#contact" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-warm-gold transition duration-200">Contacto</a>
-                    </div>
+                <!-- Menú Desktop -->
+                <div class="hidden md:flex space-x-8 main-nav">
+                    <a href="#inicio" class="text-gray-600 hover:text-[var(--color-accent-blue)] font-medium transition duration-150 ease-in-out">Inicio</a>
+                    <a href="#servicios" class="text-gray-600 hover:text-[var(--color-accent-blue)] font-medium transition duration-150 ease-in-out">Servicios</a>
+                    <a href="#presupuesto" class="text-gray-600 hover:text-[var(--color-accent-blue)] font-medium transition duration-150 ease-in-out">Presupuesto</a>
+                    <a href="#contacto" class="text-gray-600 hover:text-[var(--color-accent-blue)] font-medium transition duration-150 ease-in-out">Contacto</a>
                 </div>
 
-                <!-- Botón de Menú (Mobile) - JavaScript no es necesario ya que los toggles de menú móvil están en el archivo anterior -->
-                <div class="md:hidden">
-                    <button id="menu-button" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-white hover:text-white hover:bg-warm-gold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-primary-dark focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
-                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
-                    </button>
-                </div>
+                <!-- Botón de Menú para Móviles -->
+                <button id="menu-button" type="button" class="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--color-accent-blue)]" aria-controls="mobile-menu" aria-expanded="false">
+                    <icon name="Menu" size="24" class="block h-6 w-6"></icon>
+                </button>
             </div>
         </nav>
 
-        <!-- Menú Móvil (Necesita JS para funcionar, pero dejamos la estructura) -->
-        <div class="md:hidden hidden" id="mobile-menu">
-            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <a href="#hero" class="text-gray-300 hover:bg-warm-gold hover:text-white block px-3 py-2 rounded-md text-base font-medium">Inicio</a>
-                <a href="#products" class="text-gray-300 hover:bg-warm-gold hover:text-white block px-3 py-2 rounded-md text-base font-medium">Productos</a>
-                <!-- ENLACE A ARCHIVO EXTERNO -->
-                <a href="presupuesto.html" class="bg-accent-blue text-white block px-3 py-2 rounded-md text-base font-medium">Presupuesto</a>
-                <a href="#contact" class="text-gray-300 hover:bg-warm-gold hover:text-white block px-3 py-2 rounded-md text-base font-medium">Contacto</a>
+        <!-- Menú Móvil (Oculto por defecto) -->
+        <div class="hidden md:hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 flex flex-col main-nav">
+                <a href="#inicio" class="text-gray-600 hover:bg-gray-50 hover:text-[var(--color-accent-blue)] px-3 py-2 rounded-md text-base font-medium">Inicio</a>
+                <a href="#servicios" class="text-gray-600 hover:bg-gray-50 hover:text-[var(--color-accent-blue)] px-3 py-2 rounded-md text-base font-medium">Servicios</a>
+                <a href="#presupuesto" class="text-gray-600 hover:bg-gray-50 hover:text-[var(--color-accent-blue)] px-3 py-2 rounded-md text-base font-medium">Presupuesto</a>
+                <a href="#contacto" class="text-gray-600 hover:bg-gray-50 hover:text-[var(--color-accent-blue)] px-3 py-2 rounded-md text-base font-medium">Contacto</a>
             </div>
         </div>
     </header>
 
-    <!-- Contenido Principal -->
     <main>
-        <!-- Sección HERO (Inicio) -->
-        <section id="hero" class="hero-bg relative pt-20 flex items-center justify-center h-screen">
-            <div class="absolute inset-0 bg-primary-dark bg-opacity-70"></div>
-            <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
-                <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-tight">
-                    <span class="block">Calidad Superior en</span> 
-                    <span class="block text-accent-blue mt-2">Aberturas de PVC y Chapa</span>
+        <!-- Sección 1: Inicio (Moderno y Atractivo) -->
+        <section id="inicio" class="h-[60vh] sm:h-[80vh] flex items-center justify-center text-center">
+            <div class="text-white p-6 sm:p-12 rounded-lg backdrop-blur-sm bg-black/30">
+                <h1 class="text-4xl sm:text-6xl font-extrabold mb-4 drop-shadow-lg">
+                    Construimos la Calidad que Perdura
                 </h1>
-                <p class="mt-4 max-w-2xl mx-auto text-xl sm:text-2xl text-gray-200">
-                    Diseño, durabilidad y eficiencia energética para tu hogar o proyecto.
+                <p class="text-xl sm:text-2xl font-light mb-8 drop-shadow-md max-w-2xl mx-auto">
+                    Aberturas de PVC y Puertas de Chapa a Medida. Innovación y Resistencia para tu Obra.
                 </p>
-                <div class="mt-10 flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                    <!-- ENLACE A ARCHIVO EXTERNO -->
-                    <a href="presupuesto.html" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full shadow-xl text-white bg-accent-blue hover:bg-warm-gold transition duration-300 transform hover:scale-105">
-                        Solicitar Presupuesto Ahora
-                    </a>
-                    <a href="#products" class="inline-flex items-center justify-center px-8 py-3 border border-white text-base font-medium rounded-full shadow-xl text-white hover:bg-warm-gold hover:text-primary-dark transition duration-300 transform hover:scale-105">
-                        Ver Productos
-                    </a>
-                </div>
+                <a href="#presupuesto" class="inline-block px-8 py-3 rounded-xl text-lg font-semibold btn-primary">
+                    Solicitar Presupuesto
+                </a>
             </div>
         </section>
 
-        <!-- Sección de Características / Propuesta de Valor -->
-        <section class="py-16 bg-section-light">
+        <!-- Sección 2: Servicios/Productos Destacados -->
+        <section id="servicios" class="py-16 sm:py-24 bg-white">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="lg:text-center">
-                    <h2 class="text-3xl font-extrabold text-primary-dark sm:text-4xl">
-                        ¿Por qué elegir DURPLASS?
-                    </h2>
-                    <p class="mt-4 max-w-2xl text-xl text-gray-600 lg:mx-auto">
-                        Nuestro compromiso es con la calidad, la seguridad y el ahorro energético de tu inversión.
-                    </p>
-                </div>
-
-                <div class="mt-10">
-                    <dl class="space-y-10 md:space-y-0 md:grid md:grid-cols-3 md:gap-x-8 md:gap-y-10">
-                        <!-- Característica 1: Aislamiento Térmico -->
-                        <div class="relative">
-                            <dt>
-                                <div class="absolute flex items-center justify-center h-12 w-12 rounded-full bg-accent-blue text-white">
-                                    <!-- Icono de Termómetro/Calor (placeholder) -->
-                                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10l3-3 3 3zM6.343 18.657A8 8 0 0017.657 7.343S17 9 15 10l-3-3-3 3z" /></svg>
-                                </div>
-                                <p class="ml-16 text-lg leading-6 font-medium text-primary-dark">Eficiencia Energética</p>
-                            </dt>
-                            <dd class="mt-2 ml-16 text-base text-gray-600">
-                                Nuestras aberturas de PVC minimizan la transferencia de calor, reduciendo el consumo de climatización hasta un 50%.
-                            </dd>
-                        </div>
-
-                        <!-- Característica 2: Durabilidad y Seguridad -->
-                        <div class="relative">
-                            <dt>
-                                <div class="absolute flex items-center justify-center h-12 w-12 rounded-full bg-accent-blue text-white">
-                                    <!-- Icono de Candado/Escudo (placeholder) -->
-                                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                                </div>
-                                <p class="ml-16 text-lg leading-6 font-medium text-primary-dark">Mantenimiento Cero</p>
-                            </dt>
-                            <dd class="mt-2 ml-16 text-base text-gray-600">
-                                El PVC es resistente a la corrosión, humedad y rayos UV. No requiere pintura ni tratamientos especiales.
-                            </dd>
-                        </div>
-
-                        <!-- Característica 3: Aislamiento Acústico -->
-                        <div class="relative">
-                            <dt>
-                                <div class="absolute flex items-center justify-center h-12 w-12 rounded-full bg-accent-blue text-white">
-                                    <!-- Icono de Silencio/Oído (placeholder) -->
-                                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l1.293-1.293A1 1 0 018 7.586v8.828a1 1 0 01-.293.707l-1.293-1.293z" /></svg>
-                                </div>
-                                <p class="ml-16 text-lg leading-6 font-medium text-primary-dark">Confort Acústico</p>
-                            </dt>
-                            <dd class="mt-2 ml-16 text-base text-gray-600">
-                                Disfruta de un ambiente interior tranquilo. Nuestras aberturas reducen significativamente el ruido exterior.
-                            </dd>
-                        </div>
-                    </dl>
-                </div>
-            </div>
-        </section>
-
-        <!-- Sección de Productos (Productos) -->
-        <section id="products" class="py-16 md:py-24 bg-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-12">
-                    <h2 class="text-4xl font-extrabold text-primary-dark sm:text-5xl tracking-tight">
-                        Nuestra Línea de Productos
-                    </h2>
-                    <p class="mt-4 text-xl text-gray-600">
-                        Trabajamos con PVC de alta calidad y sistemas de chapa de máxima seguridad.
-                    </p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                    <!-- Tarjeta de Producto 1: PVC Corrediza -->
-                    <div class="bg-section-light rounded-xl shadow-lg overflow-hidden transform hover:scale-[1.02] transition duration-300">
-                        <img class="w-full h-48 object-cover" src="https://placehold.co/600x400/4A90E2/FFFFFF?text=PVC+Corrediza" alt="Ventana de PVC Corrediza">
-                        <div class="p-6">
-                            <h3 class="text-xl font-bold text-primary-dark mb-2">Ventanas de PVC Corredizas</h3>
-                            <p class="text-gray-600 mb-4 text-sm">
-                                Solución ideal para optimizar espacio y garantizar un aislamiento total. Disponibles en múltiples colores y acabados.
-                            </p>
-                            <!-- Enlace que pre-selecciona opciones en el formulario -->
-                            <a href="presupuesto.html?material=PVC&product_type=Ventana Corrediza" class="inline-block bg-warm-gold text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-primary-dark transition duration-200">
-                                ¡Pedir Presupuesto!
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Tarjeta de Producto 2: PVC Puerta-Ventana -->
-                    <div class="bg-section-light rounded-xl shadow-lg overflow-hidden transform hover:scale-[1.02] transition duration-300">
-                        <img class="w-full h-48 object-cover" src="https://placehold.co/600x400/A07A48/FFFFFF?text=PVC+Puerta+Ventana" alt="Puerta Ventana de PVC">
-                        <div class="p-6">
-                            <h3 class="text-xl font-bold text-primary-dark mb-2">Puerta-Ventanas de PVC</h3>
-                            <p class="text-gray-600 mb-4 text-sm">
-                                Conexión perfecta entre el interior y el exterior, con la máxima eficiencia y sistemas de cierre robustos.
-                            </p>
-                            <!-- Enlace que pre-selecciona opciones en el formulario -->
-                            <a href="presupuesto.html?material=PVC&product_type=Puerta Ventana Corrediza" class="inline-block bg-warm-gold text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-primary-dark transition duration-200">
-                                ¡Pedir Presupuesto!
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Tarjeta de Producto 3: Puertas de Chapa (Seguridad) -->
-                    <div class="bg-section-light rounded-xl shadow-lg overflow-hidden transform hover:scale-[1.02] transition duration-300">
-                        <img class="w-full h-48 object-cover" src="https://placehold.co/600x400/3A2A1A/FFFFFF?text=Puerta+de+Chapa" alt="Puerta de Chapa Reforzada">
-                        <div class="p-6">
-                            <h3 class="text-xl font-bold text-primary-dark mb-2">Puertas de Chapa a Medida</h3>
-                            <p class="text-gray-600 mb-4 text-sm">
-                                Máxima seguridad y resistencia. Fabricadas con la chapa más gruesa y cerraduras de alta prestación.
-                            </p>
-                            <!-- Enlace que pre-selecciona opciones en el formulario -->
-                            <a href="presupuesto.html?material=Acero&product_type=Puerta Principal" class="inline-block bg-warm-gold text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-primary-dark transition duration-200">
-                                ¡Pedir Presupuesto!
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Sección de Llamada a la Acción (CTA) -->
-        <section class="bg-accent-blue py-16">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h2 class="text-3xl font-extrabold text-white sm:text-4xl">
-                    Tu Proyecto Merece la Mejor Abertura
-                </h2>
-                <p class="mt-4 text-xl text-white opacity-90 max-w-3xl mx-auto">
-                    No comprometas la calidad. Cotiza sin cargo y descubre la diferencia DURPLASS.
-                </p>
-                <div class="mt-8">
-                    <!-- ENLACE A ARCHIVO EXTERNO -->
-                    <a href="presupuesto.html" class="inline-flex items-center justify-center px-8 py-4 border border-transparent text-base font-medium rounded-full shadow-lg text-primary-dark bg-warm-gold hover:bg-white transition duration-300 transform hover:scale-105">
-                        ¡Quiero mi Presupuesto GRATIS!
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <!-- Sección de Contacto (Contacto) -->
-        <section id="contact" class="py-16 md:py-24 bg-section-light">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="lg:text-center mb-12">
-                    <h2 class="text-4xl font-extrabold text-primary-dark sm:text-5xl tracking-tight">
-                        Contactanos
-                    </h2>
-                    <p class="mt-4 text-xl text-gray-600">
-                        Estamos listos para ayudarte con tu proyecto.
-                    </p>
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-extrabold text-[var(--color-primary-dark)] mb-4">Nuestros Servicios</h2>
+                    <p class="text-xl text-gray-600 max-w-3xl mx-auto">Soluciones integrales con la más alta calidad y tecnología.</p>
                 </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                    <div class="p-6 bg-white rounded-xl shadow-md">
-                        <div class="h-12 w-12 mx-auto bg-accent-blue rounded-full flex items-center justify-center text-white mb-4">
-                            <!-- Icono de Email -->
-                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-1 12H4a2 2 0 01-2-2V6a2 2 0 012-2h16a2 2 0 012 2v12a2 2 0 01-2 2z" /></svg>
-                        </div>
-                        <h3 class="text-lg font-bold text-primary-dark">Correo Electrónico</h3>
-                        <p class="mt-1 text-gray-600">contacto@durplass.com</p>
-                        <a href="mailto:contacto@durplass.com" class="text-accent-blue font-medium hover:text-warm-gold transition duration-200">Envía un mail</a>
+                <div class="grid md:grid-cols-3 gap-10">
+                    <!-- Tarjeta 1: Aberturas de PVC -->
+                    <div class="bg-[var(--color-bg-light)] p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 transform hover:scale-[1.02]">
+                        <icon name="Home" size="36" class="text-[var(--color-accent-blue)] mb-4"></icon>
+                        <h3 class="text-2xl font-semibold mb-3 text-[var(--color-primary-dark)]">Aberturas de PVC</h3>
+                        <p class="text-gray-600">Máximo aislamiento térmico y acústico, durabilidad inigualable y cero mantenimiento. Ideal para eficiencia energética.</p>
                     </div>
-                    
-                    <div class="p-6 bg-white rounded-xl shadow-md">
-                        <div class="h-12 w-12 mx-auto bg-accent-blue rounded-full flex items-center justify-center text-white mb-4">
-                            <!-- Icono de Teléfono -->
-                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498A1 1 0 0121 16.72V19a2 2 0 01-2 2h-12a2 2 0 01-2-2v-7z" /></svg>
-                        </div>
-                        <h3 class="text-lg font-bold text-primary-dark">Llámanos</h3>
-                        <p class="mt-1 text-gray-600">Whatsapp: +54 9 11 XXXX-XXXX</p>
-                        <a href="tel:+54911xxxxxxxx" class="text-accent-blue font-medium hover:text-warm-gold transition duration-200">Llamada Rápida</a>
+
+                    <!-- Tarjeta 2: Puertas de Chapa a Medida -->
+                    <div class="bg-[var(--color-bg-light)] p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 transform hover:scale-[1.02]">
+                         <icon name="Target" size="36" class="text-[var(--color-accent-blue)] mb-4"></icon>
+                        <h3 class="text-2xl font-semibold mb-3 text-[var(--color-primary-dark)]">Puertas de Chapa Reforzadas</h3>
+                        <p class="text-gray-600">Diseños personalizados y seguridad robusta. Fabricadas con los mejores materiales, adaptándose a cualquier requerimiento.</p>
                     </div>
-                    
-                    <div class="p-6 bg-white rounded-xl shadow-md">
-                        <div class="h-12 w-12 mx-auto bg-accent-blue rounded-full flex items-center justify-center text-white mb-4">
-                            <!-- Icono de Ubicación -->
-                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                        </div>
-                        <h3 class="text-lg font-bold text-primary-dark">Ubicación</h3>
-                        <p class="mt-1 text-gray-600">Buenos Aires, Argentina</p>
-                        <a href="#" onclick="alert('La dirección exacta se proporciona al avanzar con el presupuesto.'); return false;" class="text-accent-blue font-medium hover:text-warm-gold transition duration-200">Ver Mapa</a>
+
+                    <!-- Tarjeta 3: Asesoramiento y Colocación -->
+                    <div class="bg-[var(--color-bg-light)] p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 transform hover:scale-[1.02]">
+                         <icon name="Factory" size="36" class="text-[var(--color-accent-blue)] mb-4"></icon>
+                        <h3 class="text-2xl font-semibold mb-3 text-[var(--color-primary-dark)]">Fabricación y Logística</h3>
+                        <p class="text-gray-600">Proceso de producción optimizado en nuestra fábrica y servicio de entrega a todo el país, incluyendo la Patagonia.</p>
                     </div>
                 </div>
             </div>
         </section>
+
+        <!-- Sección 3: Formulario de Presupuesto (COMPLETO Y OPTIMIZADO) -->
+        <section id="presupuesto" class="py-16 sm:py-24 bg-[var(--color-bg-light)]">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl font-extrabold text-[var(--color-primary-dark)] mb-4">Solicitud de Presupuesto Detallado</h2>
+                    <p class="text-xl text-gray-600">Complete el formulario y cotice sus aberturas y puertas a medida.</p>
+                </div>
+
+                <!-- Mensaje de Estado (Para errores de validación o éxito) -->
+                <div id="form-status" class="hidden p-4 mb-6 text-white font-semibold rounded-lg shadow-md text-center" role="alert">
+                    Mensaje de estado.
+                </div>
+
+                <div class="bg-white p-6 sm:p-10 rounded-2xl shadow-xl border border-gray-100">
+                    <form id="budget-form" onsubmit="saveBudgetRequest(event)" class="space-y-8">
+                        
+                        <!-- Grupo 1: Datos de Contacto y Perfil -->
+                        <fieldset class="border border-gray-200 p-6 rounded-lg space-y-6">
+                            <legend class="text-xl font-bold text-[var(--color-accent-blue)] px-2">1. Información Personal y de Obra</legend>
+                            
+                            <!-- Tipo de Cliente y Obra -->
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div class="form-group">
+                                    <label for="tipo-cliente">Tipo de Cliente <span class="text-red-500">*</span></label>
+                                    <select id="tipo-cliente" name="tipo-cliente" required>
+                                        <option value="">Seleccione...</option>
+                                        <option value="particular">Particular</option>
+                                        <option value="empresa">Empresa / Constructor</option>
+                                        <option value="arquitecto">Arquitecto / Estudio</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="tipo-obra">Tipo de Obra <span class="text-red-500">*</span></label>
+                                    <select id="tipo-obra" name="tipo-obra" required>
+                                        <option value="">Seleccione...</option>
+                                        <option value="nueva">Obra Nueva</option>
+                                        <option value="remodelacion">Remodelación/Reemplazo</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <!-- Datos de Contacto -->
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div class="form-group">
+                                    <label for="nombre">Nombre y Apellido / Razón Social <span class="text-red-500">*</span></label>
+                                    <input type="text" id="nombre" name="nombre" placeholder="Juan Pérez / Constructora ABC" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">Email <span class="text-red-500">*</span></label>
+                                    <input type="email" id="email" name="email" placeholder="contacto@ejemplo.com" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="telefono">Teléfono (con código de área) <span class="text-red-500">*</span></label>
+                                    <input type="tel" id="telefono" name="telefono" placeholder="Ej: 011 15 4444 5555" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="localidad">Localidad de la Obra <span class="text-red-500">*</span></label>
+                                    <input type="text" id="localidad" name="localidad" placeholder="Tristán Suárez, Ushuaia, etc." required>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <!-- Grupo 2: Especificaciones del Producto -->
+                        <fieldset class="border border-gray-200 p-6 rounded-lg space-y-6">
+                            <legend class="text-xl font-bold text-[var(--color-accent-blue)] px-2">2. Especificaciones de Aberturas</legend>
+                            
+                            <div class="grid md:grid-cols-3 gap-6">
+                                <div class="form-group">
+                                    <label for="producto-principal">Producto Principal <span class="text-red-500">*</span></label>
+                                    <select id="producto-principal" name="producto-principal" required>
+                                        <option value="">Seleccione...</option>
+                                        <option value="pvccorrediza">Ventana de PVC Corrediza</option>
+                                        <option value="pvcoscilo">Ventana de PVC Oscilo-Batiente</option>
+                                        <option value="pvcfija">Ventana de PVC Fija</option>
+                                        <option value="puertachapa">Puerta de Chapa a Medida</option>
+                                        <option value="pvcpuerta">Puerta Balcón de PVC</option>
+                                        <option value="otros">Otros (Detallar abajo)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="cantidad-estimada">Cantidad Estimada</label>
+                                    <input type="number" id="cantidad-estimada" name="cantidad-estimada" min="1" placeholder="Ej: 5">
+                                </div>
+                                <div class="form-group">
+                                    <label for="color-perfil">Color de Perfil (PVC/Chapa)</label>
+                                    <select id="color-perfil" name="color-perfil">
+                                        <option value="blanco">Blanco</option>
+                                        <option value="negro">Negro</option>
+                                        <option value="similmadera">Símil Madera</option>
+                                        <option value="otros">Otros (Especificar)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="tipo-vidrio">Tipo de Vidrio</label>
+                                    <select id="tipo-vidrio" name="tipo-vidrio">
+                                        <option value="simple">Simple</option>
+                                        <option value="dvh494">Doble Vidrio Hermético (DVH 4/9/4)</option>
+                                        <option value="dvhotros">DVH (Otras configuraciones)</option>
+                                        <option value="laminado">Laminado de Seguridad</option>
+                                    </select>
+                                </div>
+                                <div class="form-group md:col-span-2">
+                                    <label for="medidas-estimadas">Medidas Estimadas (Ancho x Alto)</label>
+                                    <input type="text" id="medidas-estimadas" name="medidas-estimadas" placeholder="Ej: 1500mm x 1200mm, o listar principales">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="detalles-adicionales">Detalles Adicionales y Requerimientos Especiales</label>
+                                <textarea id="detalles-adicionales" name="detalles-adicionales" rows="4" placeholder="Indique tipos de apertura, cantidad total de aberturas, persianas, mosquiteros u otros detalles relevantes..."></textarea>
+                            </div>
+                        </fieldset>
+
+                        <div class="text-center pt-4">
+                            <button type="submit" class="w-full md:w-auto px-10 py-4 rounded-xl text-xl font-bold btn-primary uppercase tracking-wide">
+                                <icon name="DollarSign" size="20" class="inline mr-2"></icon>
+                                Enviar Solicitud de Presupuesto
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección 4: Contacto (Información de Ubicaciones) -->
+        <section id="contacto" class="py-16 sm:py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl font-extrabold text-[var(--color-primary-dark)] mb-4">Contáctenos</h2>
+                    <p class="text-xl text-gray-600">Tenemos dos puntos clave para brindarle el mejor servicio.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-10">
+                    <!-- Contacto 1: Oficina de Ventas (Ushuaia) -->
+                    <div class="bg-[var(--color-bg-light)] p-8 rounded-xl shadow-xl border-t-4 border-[var(--color-accent-blue)]">
+                        <icon name="MapPin" size="36" class="text-[var(--color-accent-blue)] mb-4"></icon>
+                        <h3 class="text-2xl font-semibold mb-3 text-[var(--color-primary-dark)]">Oficina Central de Ventas</h3>
+                        <p class="text-xl font-bold mb-4">Ushuaia, Tierra del Fuego</p>
+                        
+                        <ul class="space-y-3 text-gray-700">
+                            <li>
+                                <icon name="MapPin" size="18" class="inline mr-2 text-gray-500"></icon>
+                                Av. San Martín 1500 (Dirección Mock)
+                            </li>
+                            <li>
+                                <icon name="Phone" size="18" class="inline mr-2 text-gray-500"></icon>
+                                **Teléfono Ventas:** (02901) 42-XXXX (Placeholder)
+                            </li>
+                            <li>
+                                <icon name="Mail" size="18" class="inline mr-2 text-gray-500"></icon>
+                                **Email Ventas:** <a href="mailto:ventas@durplass.com.ar" class="text-[var(--color-accent-blue)] hover:underline">ventas@durplass.com.ar</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Contacto 2: Fábrica de Producción (Tristán Suárez) -->
+                    <div class="bg-[var(--color-bg-light)] p-8 rounded-xl shadow-xl border-t-4 border-[var(--color-primary-dark)]">
+                        <icon name="Factory" size="36" class="text-[var(--color-primary-dark)] mb-4"></icon>
+                        <h3 class="text-2xl font-semibold mb-3 text-[var(--color-primary-dark)]">Fábrica y Logística</h3>
+                        <p class="text-xl font-bold mb-4">Tristán Suárez, Buenos Aires</p>
+                        
+                        <ul class="space-y-3 text-gray-700">
+                            <li>
+                                <icon name="MapPin" size="18" class="inline mr-2 text-gray-500"></icon>
+                                Ruta 205 Km 42 (Dirección Mock)
+                            </li>
+                            <li>
+                                <icon name="Phone" size="18" class="inline mr-2 text-gray-500"></icon>
+                                **Teléfono Fábrica:** (011) 43-XXXX (Placeholder)
+                            </li>
+                            <li>
+                                <icon name="Mail" size="18" class="inline mr-2 text-gray-500"></icon>
+                                **Email General:** <a href="mailto:info@durplass.com.ar" class="text-[var(--color-accent-blue)] hover:underline">info@durplass.com.ar</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main>
 
-    <!-- Pie de Página (Simple) -->
-    <footer class="bg-primary-dark border-t border-gray-700">
-        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-center">
-            <p class="text-gray-400">&copy; 2025 DURPLASS S.A.S. Todos los derechos reservados.</p>
-            <p class="mt-2 text-gray-400">Diseño y Fabricación de Aberturas de Alta Performance.</p>
+    <!-- Footer -->
+    <footer class="bg-[var(--color-primary-dark)] text-white py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-lg font-bold mb-2">DURPLASS S.A.S. | Aberturas y Soluciones Constructivas</p>
+            <div class="flex flex-col sm:flex-row justify-center space-y-2 sm:space-y-0 sm:space-x-8 text-sm text-gray-300 mb-4">
+                <a href="#inicio" class="hover:text-[var(--color-warm-gold)]">Inicio</a>
+                <a href="#servicios" class="hover:text-[var(--color-warm-gold)]">Servicios</a>
+                <a href="#presupuesto" class="hover:text-[var(--color-warm-gold)]">Presupuesto</a>
+                <a href="#contacto" class="hover:text-[var(--color-warm-gold)]">Contacto</a>
+            </div>
+             <p class="text-xs text-gray-400">© 2025 DURPLASS S.A.S. Todos los derechos reservados. | Fábrica en Tristán Suárez, BA. | Ventas en Ushuaia, TDF.</p>
         </div>
     </footer>
 
-    <!-- Script para Toggle del Menú Móvil -->
-    <script>
-        document.getElementById('menu-button').addEventListener('click', function() {
-            const mobileMenu = document.getElementById('mobile-menu');
-            if(mobileMenu) mobileMenu.classList.toggle('hidden');
-        });
-    </script>
 </body>
 </html>
