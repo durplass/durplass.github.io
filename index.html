@@ -4,799 +4,312 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DURPLASS S.A.S. | Aberturas de PVC y Puertas de Chapa a Medida</title>
-    
-    <!-- Fuentes de Google: Inter para texto general y un display font si se desea para títulos grandes --><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
-    
-    <!-- Carga de Tailwind CSS para un diseño moderno y responsive --><script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Script de configuración de Tailwind para extender colores y fuentes --><script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'primary-dark': '#3A2A1A', // Marrón Oscuro - Base del logo
-                        'accent-blue': '#4A90E2', // Azul - Ventanas/Acento
-                        'warm-gold': '#A07A48',  // Dorado - Acento Cálido
-                        'bg-light': '#F8F8F8',   // Fondo de Secciones
-                        'text-main': '#222',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        display: ['Playfair Display', 'serif'], // Para títulos grandes y distintivos
-                    },
-                    keyframes: {
-                        fadeInUp: {
-                            '0%': { opacity: '0', transform: 'translateY(20px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        },
-                        scaleIn: {
-                            '0%': { transform: 'scale(0.95)', opacity: '0' },
-                            '100%': { transform: 'scale(1)', opacity: '1' },
-                        }
-                    },
-                    animation: {
-                        fadeInUp: 'fadeInUp 0.8s ease-out forwards',
-                        scaleIn: 'scaleIn 0.6s ease-out forwards',
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- Carga de Tailwind CSS para un diseño moderno y responsive -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* Estilos generales y scroll suave */
+        /* Paleta de Colores DURPLASS inspirada en el logo */
+        :root {
+            --color-primary-dark: #3A2A1A; /* Marrón Oscuro - Base del logo */
+            --color-accent-blue: #4A90E2; /* Azul - Ventanas/Acento */
+            --color-warm-gold: #A07A48; /* Dorado - Acento Cálido */
+            --color-bg-light: #F8F8F8; /* Fondo de Secciones */
+            --color-text-main: #222;
+            --color-white: #ffffff;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Estilos generales, scroll suave y corrección de espaciado de líneas */
         html { scroll-behavior: smooth; }
-        body { 
-            color: theme('colors.text-main'); 
-            line-height: 1.6; 
-            font-family: theme('fontFamily.sans'); 
-            background-color: theme('colors.white'); 
-        }
+        body { background-color: var(--color-white); color: var(--color-text-main); }
+        .bg-primary-dark { background-color: var(--color-primary-dark); }
+        .text-accent-blue { color: var(--color-accent-blue); }
+        .bg-accent-blue { background-color: var(--color-accent-blue); }
+        .bg-warm-gold { background-color: var(--color-warm-gold); }
+        .hover\:bg-warm-gold:hover { background-color: var(--color-warm-gold); }
+        .bg-section-light { background-color: var(--color-bg-light); }
 
-        /* Estilo base para todos los títulos de sección (h2) */
-        .section-title {
-            position: relative;
-            padding-bottom: 0.5rem;
-            display: inline-block;
-            font-size: 2.5rem; /* text-4xl o más */
-            font-weight: 800; /* font-extrabold */
-            color: theme('colors.primary-dark');
-            font-family: theme('fontFamily.display');
-        }
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 50%; /* Línea de acento debajo del título */
-            height: 5px;
-            background-color: theme('colors.warm-gold');
-            border-radius: 9999px;
-        }
-
-        /* Estilos de Botón Primario */
-        .btn-primary {
-            display: inline-block;
-            padding: 0.9rem 2.5rem;
-            border-radius: 0.75rem; /* rounded-xl */
-            font-weight: 700; /* font-bold */
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            background-color: theme('colors.accent-blue');
-            color: theme('colors.white');
-            box-shadow: 0 10px 15px -3px rgba(74, 144, 226, 0.4), 0 4px 6px -2px rgba(74, 144, 226, 0.2);
-            transition: all 0.3s ease-in-out;
-            border: none;
-            cursor: pointer;
-        }
-        .btn-primary:hover {
-            background-color: #3e7fd9; /* Un tono más oscuro de azul */
-            box-shadow: 0 20px 25px -5px rgba(74, 144, 226, 0.6), 0 10px 10px -5px rgba(74, 144, 226, 0.4);
-            transform: translateY(-2px);
-        }
-
-        /* Estilo para los inputs focus */
-        .form-input-focus:focus {
-             box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.3);
-        }
-
-        /* Estilos para tarjetas de producto (Product Card) */
-        .product-card {
-            background-color: white;
-            border-radius: 1.5rem; /* rounded-xl */
-            overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-
-        /* Estilos del Hero section con imagen de fondo */
-        .hero-background {
-            background-image: url('https://placehold.co/1920x800/A07A48/3A2A1A/png?text=Vivienda+Moderna+DURPLASS'); /* Placeholder */
+        /* HERO Section Background with Placeholder */
+        .hero-bg {
+            background-image: url('https://placehold.co/1920x800/3A2A1A/A07A48?text=FOTO+DE+FACHADA+MODERNA');
             background-size: cover;
             background-position: center;
-            background-repeat: no-repeat;
-            position: relative;
-        }
-        .hero-background::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(to top, rgba(58, 42, 26, 0.7) 0%, rgba(58, 42, 26, 0.3) 50%, rgba(58, 42, 26, 0.0) 100%);
+            background-attachment: fixed; /* Efecto Parallax */
         }
     </style>
-
-    <!-- Importaciones de Firebase --><script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, addDoc, onSnapshot, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        
-        // Variables globales
-        let app;
-        let db;
-        let auth;
-        let userId;
-        let appId;
-
-        // Configuración de Colores Condicionales
-        const colorOptions = {
-            'PVC': ['BLANCO', 'ROBLE DORADO', 'NOGAL', 'GRIS ANTRACITA', 'NEGRO MATE', 'BLACK BROWN'],
-            'ALUMINIO': ['BLANCO', 'NEGRO']
-        };
-
-        // Función para actualizar las opciones de color según el material
-        function updateColors() {
-            const materialSelect = document.getElementById('material');
-            const colorSelect = document.getElementById('color');
-            if (!materialSelect || !colorSelect) return; // Asegurarse de que los elementos existan
-
-            const selectedMaterial = materialSelect.value;
-            const colors = colorOptions[selectedMaterial] || [];
-
-            colorSelect.innerHTML = ''; // Limpiar opciones anteriores
-            colorSelect.disabled = !selectedMaterial; // Deshabilitar si no hay material seleccionado
-
-            const defaultOption = document.createElement('option');
-            defaultOption.value = "";
-            defaultOption.textContent = selectedMaterial ? "Seleccione un color" : "Seleccione material primero";
-            defaultOption.disabled = true;
-            defaultOption.selected = true;
-            colorSelect.appendChild(defaultOption);
-
-            colors.forEach(color => {
-                const option = document.createElement('option');
-                option.value = color;
-                option.textContent = color;
-                colorSelect.appendChild(option);
-            });
-            
-            // Si hay un color seleccionado que ya no es válido, se borra
-            if (colorSelect.selectedIndex !== 0) {
-                const selectedValue = colorSelect.value;
-                if (colors.length > 0 && !colors.includes(selectedValue)) {
-                    colorSelect.selectedIndex = 0;
-                }
-            }
-        }
-
-        // Función de inicialización de Firebase
-        window.initializeFirebase = async function() {
-            setLogLevel('Debug');
-            
-            const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-            const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-            appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id'; // Asegúrate de que appId se inicialice
-
-            if (Object.keys(firebaseConfig).length === 0) {
-                console.error("Firebase configuration is missing.");
-                showMessage("Error: Configuración de Firebase faltante.", 'bg-red-500');
-                return;
-            }
-
-            try {
-                app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-                
-                // Autenticación: usar token custom si existe, sino anónimo
-                onAuthStateChanged(auth, async (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        console.log("Authenticated user ID:", userId);
-                    } else {
-                        // Si no hay token inicial, usa anónimo.
-                        if (!initialAuthToken) {
-                            const anonymousUser = await signInAnonymously(auth);
-                            userId = anonymousUser.user.uid;
-                            console.log("Signed in anonymously. User ID:", userId);
-                        }
-                    }
-                    if (document.getElementById('user-id-display')) {
-                        document.getElementById('user-id-display').textContent = `ID de Usuario: ${userId}`;
-                    }
-                });
-
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                }
-
-                // Asegúrate de que el formulario y sus selectores existan antes de añadir listeners
-                if (document.getElementById('quote-form')) {
-                    document.getElementById('quote-form').addEventListener('submit', submitQuoteRequest);
-                }
-                if (document.getElementById('material')) {
-                    document.getElementById('material').addEventListener('change', updateColors);
-                    updateColors(); // Inicializar al cargar
-                }
-
-            } catch (error) {
-                console.error("Firebase initialization failed:", error);
-                showMessage("Error al iniciar la aplicación. Intente recargar la página.", 'bg-red-500');
-            }
-        }
-
-        // Función para manejar el envío del formulario de cotización
-        async function submitQuoteRequest(event) {
-            event.preventDefault();
-            
-            if (!db || !userId) {
-                showMessage("La conexión con la base de datos no está lista. Inténtalo de nuevo.", 'bg-red-500');
-                return;
-            }
-
-            const form = event.target;
-            const formData = new FormData(form);
-            const requestData = {};
-
-            formData.forEach((value, key) => {
-                requestData[key] = typeof value === 'string' ? value.trim() : value;
-            });
-            
-            requestData.userId = userId;
-            requestData.timestamp = serverTimestamp(); // Usar serverTimestamp para asegurar consistencia
-
-            const submitButton = document.getElementById('submit-button');
-            submitButton.disabled = true;
-            submitButton.textContent = 'Enviando...';
-
-            try {
-                const collectionPath = `artifacts/${appId}/users/${userId}/quote_requests`;
-                const docRef = await addDoc(collection(db, collectionPath), requestData);
-                
-                console.log("Document written with ID: ", docRef.id);
-                showMessage("¡Cotización enviada con éxito! Nos pondremos en contacto pronto.", 'bg-green-500');
-                form.reset();
-                updateColors(); 
-
-            } catch (e) {
-                console.error("Error al añadir documento: ", e);
-                showMessage(`Error al enviar la solicitud: ${e.message}`, 'bg-red-500');
-            } finally {
-                submitButton.disabled = false;
-                submitButton.textContent = 'Solicitar Cotización';
-            }
-        }
-
-        // Función para mostrar mensajes de estado
-        window.showMessage = function(message, className) {
-            const statusMessage = document.getElementById('form-status');
-            
-            if (!statusMessage) {
-                console.error("DOM element 'form-status' not found. Skipping message display.");
-                return;
-            }
-
-            statusMessage.classList.remove('hidden', 'bg-red-500', 'bg-green-500', 'bg-yellow-500', 'opacity-0');
-            statusMessage.classList.add(className, 'opacity-100');
-            statusMessage.textContent = message;
-            
-            setTimeout(() => {
-                statusMessage.classList.add('hidden', 'opacity-0');
-            }, 5000);
-        }
-
-        // Toggle mobile menu visibility
-        document.addEventListener('DOMContentLoaded', () => {
-            const menuButton = document.getElementById('menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
-
-            if (menuButton && mobileMenu) {
-                menuButton.addEventListener('click', function() {
-                    mobileMenu.classList.toggle('hidden');
-                });
-            }
-        
-            // Hide mobile menu when a link is clicked
-            document.querySelectorAll('#mobile-menu a').forEach(item => {
-                item.addEventListener('click', () => {
-                    if(mobileMenu) mobileMenu.classList.add('hidden');
-                });
-            });
-        });
-
-        // Start initialization when the window loads
-        window.onload = initializeFirebase;
-    </script>
 </head>
-<body class="min-h-screen antialiased">
-    <!-- 
-        ============================================================
-        Componente de Mensaje de Estado Global (para alerts/confirm)
-        ============================================================
-    --><div id="form-status" class="hidden fixed top-4 right-4 p-4 rounded-lg shadow-xl text-white font-semibold transition-opacity duration-300 z-[9999] max-w-sm" role="alert">
-        <!-- El mensaje de estado se inyecta aquí --></div>
 
-    <!-- 
-        ============================================================
-        Navegación Principal 
-        ============================================================
-    --><header class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100 shadow-md">
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <!-- Logo / Marca --><a href="#inicio" class="flex items-center space-x-3 group">
-                <!-- SVG animado, más moderno --><svg class="h-8 w-8 text-primary-dark group-hover:rotate-6 transition duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-9 13V3"></path>
-                </svg>
-                <span class="text-2xl font-extrabold text-primary-dark font-display">DURPLASS</span>
-            </a>
+<body>
+    <!-- Encabezado Fijo -->
+    <header class="bg-primary-dark fixed w-full z-10 shadow-lg text-white">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo y Nombre -->
+                <div class="flex-shrink-0">
+                    <a href="#hero" class="flex items-center space-x-2">
+                        <img class="h-10 w-auto rounded-full" src="https://placehold.co/40x40/A07A48/3A2A1A?text=DUR" alt="Logo DURPLASS">
+                        <span class="text-xl font-extrabold tracking-tight text-white hidden sm:block">DURPLASS S.A.S.</span>
+                    </a>
+                </div>
+                
+                <!-- Menú Principal (Desktop) -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#hero" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-warm-gold transition duration-200">Inicio</a>
+                        <a href="#products" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-warm-gold transition duration-200">Productos</a>
+                        <!-- ENLACE A ARCHIVO EXTERNO -->
+                        <a href="presupuesto.html" class="px-3 py-2 rounded-md text-sm font-medium bg-accent-blue text-white hover:bg-warm-gold transition duration-200">Presupuesto</a>
+                        <a href="#contact" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-warm-gold transition duration-200">Contacto</a>
+                    </div>
+                </div>
 
-            <!-- Menú Desktop --><div class="hidden md:flex space-x-6 lg:space-x-10 items-center">
-                <a href="#inicio" class="nav-link-desktop">Inicio</a>
-                <a href="#nosotros" class="nav-link-desktop">Nosotros</a>
-                <a href="#productos" class="nav-link-desktop">Productos</a>
-                <a href="#servicios" class="nav-link-desktop">Servicios</a>
-                <a href="#cotizacion" class="nav-link-desktop-active">Cotización</a>
-                <a href="#contacto" class="btn-primary-small">Contacto</a>
-            </div>
-            
-            <!-- Botón Menú Mobile (Hamburger) --><div class="flex items-center md:hidden">
-                <button id="menu-button" type="button" class="inline-flex items-center justify-center p-2 rounded-xl text-primary-dark hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent-blue" aria-controls="mobile-menu" aria-expanded="false">
-                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-                    </svg>
-                </button>
+                <!-- Botón de Menú (Mobile) - JavaScript no es necesario ya que los toggles de menú móvil están en el archivo anterior -->
+                <div class="md:hidden">
+                    <button id="menu-button" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-white hover:text-white hover:bg-warm-gold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-primary-dark focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
+                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                    </button>
+                </div>
             </div>
         </nav>
 
-        <!-- Menú Mobile --><div class="md:hidden hidden" id="mobile-menu">
-            <div class="px-2 pt-2 pb-3 space-y-1">
-                <a href="#inicio" class="nav-link-mobile">Inicio</a>
-                <a href="#nosotros" class="nav-link-mobile">Nosotros</a>
-                <a href="#productos" class="nav-link-mobile">Productos</a>
-                <a href="#servicios" class="nav-link-mobile">Servicios</a>
-                <a href="#cotizacion" class="nav-link-mobile-active">Cotización</a>
-                <a href="#contacto" class="nav-link-mobile btn-primary-small">Contacto</a>
+        <!-- Menú Móvil (Necesita JS para funcionar, pero dejamos la estructura) -->
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#hero" class="text-gray-300 hover:bg-warm-gold hover:text-white block px-3 py-2 rounded-md text-base font-medium">Inicio</a>
+                <a href="#products" class="text-gray-300 hover:bg-warm-gold hover:text-white block px-3 py-2 rounded-md text-base font-medium">Productos</a>
+                <!-- ENLACE A ARCHIVO EXTERNO -->
+                <a href="presupuesto.html" class="bg-accent-blue text-white block px-3 py-2 rounded-md text-base font-medium">Presupuesto</a>
+                <a href="#contact" class="text-gray-300 hover:bg-warm-gold hover:text-white block px-3 py-2 rounded-md text-base font-medium">Contacto</a>
             </div>
         </div>
     </header>
 
-    <style>
-        .nav-link-desktop {
-            @apply text-gray-700 hover:text-accent-blue font-medium px-3 py-2 rounded-lg transition duration-300 text-base;
-        }
-        .nav-link-desktop-active {
-            @apply text-accent-blue font-bold px-3 py-2 rounded-lg border-b-2 border-accent-blue transition duration-300 text-base;
-        }
-        .nav-link-mobile {
-            @apply block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 transition duration-300;
-        }
-        .nav-link-mobile-active {
-            @apply block px-3 py-2 rounded-md text-base font-medium text-accent-blue bg-gray-50 transition duration-300;
-        }
-        .btn-primary-small {
-            @apply text-white bg-accent-blue hover:bg-blue-700 py-2 px-4 rounded-xl transition duration-300 shadow-md font-bold text-sm uppercase;
-        }
-    </style>
-
-    <main class="min-h-screen">
-        
-        <!-- 
-            ============================================================
-            Sección 1: Inicio / Hero (Inspirada en PVCCER pero con estilo DURPLASS)
-            ============================================================
-        --><section id="inicio" class="hero-background flex items-center justify-center min-h-[70vh] md:min-h-[85vh] text-white relative overflow-hidden">
-            <div class="absolute inset-0 bg-black opacity-40 z-10"></div> <!-- Overlay para texto legible --><div class="relative z-20 text-center max-w-5xl mx-auto px-6 py-16 animate-fadeInUp">
-                <h1 class="text-5xl md:text-7xl font-extrabold font-display leading-tight mb-6 animate-fadeInUp" style="animation-delay: 0.2s;">
-                    DURPLASS: Donde la Calidad <span class="text-accent-blue">Transforma</span> tu Espacio
+    <!-- Contenido Principal -->
+    <main>
+        <!-- Sección HERO (Inicio) -->
+        <section id="hero" class="hero-bg relative pt-20 flex items-center justify-center h-screen">
+            <div class="absolute inset-0 bg-primary-dark bg-opacity-70"></div>
+            <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
+                <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-tight">
+                    <span class="block">Calidad Superior en</span> 
+                    <span class="block text-accent-blue mt-2">Aberturas de PVC y Chapa</span>
                 </h1>
-                <p class="text-xl md:text-2xl font-light leading-relaxed mb-10 animate-fadeInUp" style="animation-delay: 0.4s;">
-                    Experimenta la excelencia en aberturas de PVC y soluciones de chapa a medida que combinan eficiencia, seguridad y un diseño inigualable.
+                <p class="mt-4 max-w-2xl mx-auto text-xl sm:text-2xl text-gray-200">
+                    Diseño, durabilidad y eficiencia energética para tu hogar o proyecto.
                 </p>
-                <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6 animate-fadeInUp" style="animation-delay: 0.6s;">
-                    <a href="#productos" class="btn-primary hover:scale-105 transition-transform duration-300">Explorar Productos</a>
-                    <a href="#cotizacion" class="px-8 py-4 bg-white text-primary-dark rounded-xl font-bold shadow-lg hover:bg-gray-100 hover:text-accent-blue transition duration-300 transform hover:scale-105">
-                        Solicitar Cotización
+                <div class="mt-10 flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+                    <!-- ENLACE A ARCHIVO EXTERNO -->
+                    <a href="presupuesto.html" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full shadow-xl text-white bg-accent-blue hover:bg-warm-gold transition duration-300 transform hover:scale-105">
+                        Solicitar Presupuesto Ahora
+                    </a>
+                    <a href="#products" class="inline-flex items-center justify-center px-8 py-3 border border-white text-base font-medium rounded-full shadow-xl text-white hover:bg-warm-gold hover:text-primary-dark transition duration-300 transform hover:scale-105">
+                        Ver Productos
                     </a>
                 </div>
             </div>
         </section>
 
-        <!-- 
-            ============================================================
-            Sección 2: Destacados / Propuesta de Valor
-            ============================================================
-        --><section id="destacados" class="py-16 bg-white border-b border-gray-100">
+        <!-- Sección de Características / Propuesta de Valor -->
+        <section class="py-16 bg-section-light">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                    
-                    <div class="p-6 bg-white rounded-2xl shadow-xl hover:shadow-2xl transition duration-300 border-t-4 border-accent-blue transform hover:-translate-y-2 animate-scaleIn" style="animation-delay: 0.8s;">
-                        <div class="text-accent-blue mb-4">
-                            <svg class="w-12 h-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-primary-dark mb-2 font-display">Eficiencia Energética</h3>
-                        <p class="text-gray-600">Minimiza pérdidas de calor y optimiza el consumo energético en tu hogar.</p>
-                    </div>
+                <div class="lg:text-center">
+                    <h2 class="text-3xl font-extrabold text-primary-dark sm:text-4xl">
+                        ¿Por qué elegir DURPLASS?
+                    </h2>
+                    <p class="mt-4 max-w-2xl text-xl text-gray-600 lg:mx-auto">
+                        Nuestro compromiso es con la calidad, la seguridad y el ahorro energético de tu inversión.
+                    </p>
+                </div>
 
-                    <div class="p-6 bg-white rounded-2xl shadow-xl hover:shadow-2xl transition duration-300 border-t-4 border-warm-gold transform hover:-translate-y-2 animate-scaleIn" style="animation-delay: 1s;">
-                        <div class="text-warm-gold mb-4">
-                            <svg class="w-12 h-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.276a11.952 11.952 0 01-.886-.968m-4.482-2.147A9.954 9.954 0 0012 3C7.582 3 4 6.582 4 11c0 1.983.725 3.805 1.947 5.143M17.618 10.276a11.952 11.952 0 00-.886-.968m-4.482-2.147A9.954 9.954 0 0112 3c4.418 0 8 3.582 8 7.999 0 1.983-.725 3.805-1.947 5.143M7 13v3a1 1 0 001 1h6a1 1 0 001-1v-3"></path></svg>
+                <div class="mt-10">
+                    <dl class="space-y-10 md:space-y-0 md:grid md:grid-cols-3 md:gap-x-8 md:gap-y-10">
+                        <!-- Característica 1: Aislamiento Térmico -->
+                        <div class="relative">
+                            <dt>
+                                <div class="absolute flex items-center justify-center h-12 w-12 rounded-full bg-accent-blue text-white">
+                                    <!-- Icono de Termómetro/Calor (placeholder) -->
+                                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10l3-3 3 3zM6.343 18.657A8 8 0 0017.657 7.343S17 9 15 10l-3-3-3 3z" /></svg>
+                                </div>
+                                <p class="ml-16 text-lg leading-6 font-medium text-primary-dark">Eficiencia Energética</p>
+                            </dt>
+                            <dd class="mt-2 ml-16 text-base text-gray-600">
+                                Nuestras aberturas de PVC minimizan la transferencia de calor, reduciendo el consumo de climatización hasta un 50%.
+                            </dd>
                         </div>
-                        <h3 class="text-xl font-bold text-primary-dark mb-2 font-display">Aislamiento Acústico</h3>
-                        <p class="text-gray-600">Disfruta de un ambiente tranquilo y sereno, libre de ruidos externos.</p>
-                    </div>
 
-                    <div class="p-6 bg-white rounded-2xl shadow-xl hover:shadow-2xl transition duration-300 border-t-4 border-primary-dark transform hover:-translate-y-2 animate-scaleIn" style="animation-delay: 1.2s;">
-                        <div class="text-primary-dark mb-4">
-                            <svg class="w-12 h-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11l3-3m0 0l3 3m-3-3v8m0-13A9 9 0 112 12a9 9 0 0118 0z"></path></svg>
+                        <!-- Característica 2: Durabilidad y Seguridad -->
+                        <div class="relative">
+                            <dt>
+                                <div class="absolute flex items-center justify-center h-12 w-12 rounded-full bg-accent-blue text-white">
+                                    <!-- Icono de Candado/Escudo (placeholder) -->
+                                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                                </div>
+                                <p class="ml-16 text-lg leading-6 font-medium text-primary-dark">Mantenimiento Cero</p>
+                            </dt>
+                            <dd class="mt-2 ml-16 text-base text-gray-600">
+                                El PVC es resistente a la corrosión, humedad y rayos UV. No requiere pintura ni tratamientos especiales.
+                            </dd>
                         </div>
-                        <h3 class="text-xl font-bold text-primary-dark mb-2 font-display">Seguridad y Durabilidad</h3>
-                        <p class="text-gray-600">Materiales de primera calidad para una protección robusta y larga vida útil.</p>
-                    </div>
 
+                        <!-- Característica 3: Aislamiento Acústico -->
+                        <div class="relative">
+                            <dt>
+                                <div class="absolute flex items-center justify-center h-12 w-12 rounded-full bg-accent-blue text-white">
+                                    <!-- Icono de Silencio/Oído (placeholder) -->
+                                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l1.293-1.293A1 1 0 018 7.586v8.828a1 1 0 01-.293.707l-1.293-1.293z" /></svg>
+                                </div>
+                                <p class="ml-16 text-lg leading-6 font-medium text-primary-dark">Confort Acústico</p>
+                            </dt>
+                            <dd class="mt-2 ml-16 text-base text-gray-600">
+                                Disfruta de un ambiente interior tranquilo. Nuestras aberturas reducen significativamente el ruido exterior.
+                            </dd>
+                        </div>
+                    </dl>
                 </div>
             </div>
         </section>
 
-        <!-- 
-            ============================================================
-            Sección 3: Nosotros (Misión y Visión)
-            ============================================================
-        --><section id="nosotros" class="py-20 bg-bg-light">
+        <!-- Sección de Productos (Productos) -->
+        <section id="products" class="py-16 md:py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl font-extrabold text-primary-dark sm:text-5xl tracking-tight">
+                        Nuestra Línea de Productos
+                    </h2>
+                    <p class="mt-4 text-xl text-gray-600">
+                        Trabajamos con PVC de alta calidad y sistemas de chapa de máxima seguridad.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                    <!-- Tarjeta de Producto 1: PVC Corrediza -->
+                    <div class="bg-section-light rounded-xl shadow-lg overflow-hidden transform hover:scale-[1.02] transition duration-300">
+                        <img class="w-full h-48 object-cover" src="https://placehold.co/600x400/4A90E2/FFFFFF?text=PVC+Corrediza" alt="Ventana de PVC Corrediza">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-primary-dark mb-2">Ventanas de PVC Corredizas</h3>
+                            <p class="text-gray-600 mb-4 text-sm">
+                                Solución ideal para optimizar espacio y garantizar un aislamiento total. Disponibles en múltiples colores y acabados.
+                            </p>
+                            <!-- Enlace que pre-selecciona opciones en el formulario -->
+                            <a href="presupuesto.html?material=PVC&product_type=Ventana Corrediza" class="inline-block bg-warm-gold text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-primary-dark transition duration-200">
+                                ¡Pedir Presupuesto!
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta de Producto 2: PVC Puerta-Ventana -->
+                    <div class="bg-section-light rounded-xl shadow-lg overflow-hidden transform hover:scale-[1.02] transition duration-300">
+                        <img class="w-full h-48 object-cover" src="https://placehold.co/600x400/A07A48/FFFFFF?text=PVC+Puerta+Ventana" alt="Puerta Ventana de PVC">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-primary-dark mb-2">Puerta-Ventanas de PVC</h3>
+                            <p class="text-gray-600 mb-4 text-sm">
+                                Conexión perfecta entre el interior y el exterior, con la máxima eficiencia y sistemas de cierre robustos.
+                            </p>
+                            <!-- Enlace que pre-selecciona opciones en el formulario -->
+                            <a href="presupuesto.html?material=PVC&product_type=Puerta Ventana Corrediza" class="inline-block bg-warm-gold text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-primary-dark transition duration-200">
+                                ¡Pedir Presupuesto!
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta de Producto 3: Puertas de Chapa (Seguridad) -->
+                    <div class="bg-section-light rounded-xl shadow-lg overflow-hidden transform hover:scale-[1.02] transition duration-300">
+                        <img class="w-full h-48 object-cover" src="https://placehold.co/600x400/3A2A1A/FFFFFF?text=Puerta+de+Chapa" alt="Puerta de Chapa Reforzada">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-primary-dark mb-2">Puertas de Chapa a Medida</h3>
+                            <p class="text-gray-600 mb-4 text-sm">
+                                Máxima seguridad y resistencia. Fabricadas con la chapa más gruesa y cerraduras de alta prestación.
+                            </p>
+                            <!-- Enlace que pre-selecciona opciones en el formulario -->
+                            <a href="presupuesto.html?material=Acero&product_type=Puerta Principal" class="inline-block bg-warm-gold text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-primary-dark transition duration-200">
+                                ¡Pedir Presupuesto!
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Llamada a la Acción (CTA) -->
+        <section class="bg-accent-blue py-16">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h2 class="section-title mx-auto animate-fadeInUp">Nuestra Promesa de Valor</h2>
-                <p class="mt-4 mb-12 text-lg text-gray-600 max-w-3xl mx-auto animate-fadeInUp" style="animation-delay: 0.2s;">
-                    DURPLASS se fundamenta en la calidad inquebrantable y el servicio personalizado. Construimos soluciones duraderas.
+                <h2 class="text-3xl font-extrabold text-white sm:text-4xl">
+                    Tu Proyecto Merece la Mejor Abertura
+                </h2>
+                <p class="mt-4 text-xl text-white opacity-90 max-w-3xl mx-auto">
+                    No comprometas la calidad. Cotiza sin cargo y descubre la diferencia DURPLASS.
                 </p>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <!-- Card 1: Misión --><div class="p-8 bg-white rounded-2xl shadow-lg border-t-4 border-accent-blue transition duration-300 hover:shadow-xl transform hover:-translate-y-1 animate-scaleIn" style="animation-delay: 0.4s;">
-                        <h3 class="text-2xl font-bold text-primary-dark mb-3 font-display">Misión</h3>
-                        <p class="text-gray-700">Ofrecer soluciones de cerramiento que maximicen la eficiencia energética y el confort, superando las expectativas del cliente a través de la innovación y la excelencia en el servicio.</p>
-                    </div>
-
-                    <!-- Card 2: Visión --><div class="p-8 bg-white rounded-2xl shadow-lg border-t-4 border-warm-gold transition duration-300 hover:shadow-xl transform hover:-translate-y-1 animate-scaleIn" style="animation-delay: 0.6s;">
-                        <h3 class="text-2xl font-bold text-primary-dark mb-3 font-display">Visión</h3>
-                        <p class="text-gray-700">Ser la empresa líder en aberturas de PVC y puertas de chapa de la región, reconocida por nuestra calidad, compromiso y sostenibilidad.</p>
-                    </div>
-
-                    <!-- Card 3: Valores --><div class="p-8 bg-white rounded-2xl shadow-lg border-t-4 border-primary-dark transition duration-300 hover:shadow-xl transform hover:-translate-y-1 animate-scaleIn" style="animation-delay: 0.8s;">
-                        <h3 class="text-2xl font-bold text-primary-dark mb-3 font-display">Valores</h3>
-                        <p class="text-gray-700">Compromiso, Calidad, Integridad, Innovación y Enfoque en el Cliente. Estos pilares guían cada proyecto que emprendemos.</p>
-                    </div>
+                <div class="mt-8">
+                    <!-- ENLACE A ARCHIVO EXTERNO -->
+                    <a href="presupuesto.html" class="inline-flex items-center justify-center px-8 py-4 border border-transparent text-base font-medium rounded-full shadow-lg text-primary-dark bg-warm-gold hover:bg-white transition duration-300 transform hover:scale-105">
+                        ¡Quiero mi Presupuesto GRATIS!
+                    </a>
                 </div>
             </div>
         </section>
 
-        <!-- 
-            ============================================================
-            Sección 4: Productos Destacados
-            ============================================================
-        --><section id="productos" class="py-20 bg-white">
+        <!-- Sección de Contacto (Contacto) -->
+        <section id="contact" class="py-16 md:py-24 bg-section-light">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="section-title animate-fadeInUp">Nuestros Productos</h2>
-                <p class="mt-4 mb-12 text-lg text-gray-600 animate-fadeInUp" style="animation-delay: 0.2s;">Explora nuestra gama de productos de alta prestación y fabricación a medida.</p>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <!-- Producto 1: Ventanas PVC Alta Prestación --><div class="product-card animate-scaleIn" style="animation-delay: 0.4s;">
-                        <img src="https://placehold.co/400x300/4A90E2/ffffff?text=Ventanas+PVC" alt="Ventanas de PVC" class="w-full h-48 object-cover rounded-t-xl">
-                        <div class="p-6">
-                            <h3 class="text-xl font-bold text-primary-dark mb-2 font-display">Ventanas de PVC Premium</h3>
-                            <p class="text-gray-600 text-sm">Máximo aislamiento térmico y acústico. Diseños oscilobatientes y corredizos.</p>
-                        </div>
-                    </div>
-
-                    <!-- Producto 2: Puertas de Chapa a Medida --><div class="product-card animate-scaleIn" style="animation-delay: 0.6s;">
-                        <img src="https://placehold.co/400x300/A07A48/ffffff?text=Puertas+Chapa" alt="Puertas de Chapa" class="w-full h-48 object-cover rounded-t-xl">
-                        <div class="p-6">
-                            <h3 class="text-xl font-bold text-primary-dark mb-2 font-display">Puertas de Chapa Reforzadas</h3>
-                            <p class="text-gray-600 text-sm">Seguridad, durabilidad y acabados estéticos. Fabricación 100% a medida.</p>
-                        </div>
-                    </div>
-
-                    <!-- Producto 3: Puertas Balcón PVC --><div class="product-card animate-scaleIn" style="animation-delay: 0.8s;">
-                        <img src="https://placehold.co/400x300/3A2A1A/ffffff?text=Puerta+Balcon+PVC" alt="Puertas Balcón de PVC" class="w-full h-48 object-cover rounded-t-xl">
-                        <div class="p-6">
-                            <h3 class="text-xl font-bold text-primary-dark mb-2 font-display">Puertas Balcón</h3>
-                            <p class="text-gray-600 text-sm">Transición perfecta entre interior y exterior, con máxima hermeticidad.</p>
-                        </div>
-                    </div>
-
-                    <!-- Producto 4: Soluciones Especiales --><div class="product-card animate-scaleIn" style="animation-delay: 1s;">
-                        <img src="https://placehold.co/400x300/F8F8F8/3A2A1A?text=Aberturas+Especiales" alt="Aberturas Especiales" class="w-full h-48 object-cover rounded-t-xl">
-                        <div class="p-6">
-                            <h3 class="text-xl font-bold text-primary-dark mb-2 font-display">Aberturas Especiales</h3>
-                            <p class="text-gray-600 text-sm">Proyectos únicos y soluciones personalizadas para arquitectos y constructores.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="text-center mt-16 animate-fadeInUp" style="animation-delay: 1.2s;">
-                    <a href="#contacto" class="btn-primary">Solicitar Catálogo Completo</a>
-                </div>
-            </div>
-        </section>
-
-        <!-- 
-            ============================================================
-            Sección 5: Servicios
-            ============================================================
-        --><section id="servicios" class="py-20 bg-bg-light">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center">
-                    <h2 class="section-title mx-auto animate-fadeInUp">Nuestros Servicios</h2>
-                    <p class="mt-4 mb-12 text-lg text-gray-600 max-w-4xl mx-auto animate-fadeInUp" style="animation-delay: 0.2s;">
-                        Acompañamos tu proyecto desde la idea inicial hasta la instalación final, asegurando un trabajo sin fisuras.
+                <div class="lg:text-center mb-12">
+                    <h2 class="text-4xl font-extrabold text-primary-dark sm:text-5xl tracking-tight">
+                        Contactanos
+                    </h2>
+                    <p class="mt-4 text-xl text-gray-600">
+                        Estamos listos para ayudarte con tu proyecto.
                     </p>
                 </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 text-center">
-                    <!-- Servicio 1: Asesoramiento y Medición --><div class="p-8 bg-white rounded-2xl shadow-xl border-b-4 border-accent-blue transform hover:-translate-y-1 transition duration-300 animate-scaleIn" style="animation-delay: 0.4s;">
-                        <svg class="h-12 w-12 text-accent-blue mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M17 12h.01"/></svg>
-                        <h3 class="text-2xl font-bold text-primary-dark mb-3 font-display">Asesoramiento y Presupuesto</h3>
-                        <p class="text-gray-700">Te ayudamos a elegir la mejor solución para tu proyecto. Incluye toma de medidas en obra y presupuesto detallado sin cargo.</p>
-                    </div>
-
-                    <!-- Servicio 2: Instalación Profesional --><div class="p-8 bg-white rounded-2xl shadow-xl border-b-4 border-warm-gold transform hover:-translate-y-1 transition duration-300 animate-scaleIn" style="animation-delay: 0.6s;">
-                        <svg class="h-12 w-12 text-warm-gold mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2"/></svg>
-                        <h3 class="text-2xl font-bold text-primary-dark mb-3 font-display">Instalación y Post-Venta</h3>
-                        <p class="text-gray-700">Equipo propio de instaladores certificados para garantizar la colocación perfecta y soporte post-venta para cualquier necesidad.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <!-- 
-            ============================================================
-            Sección 6: Cotización (Formulario)
-            ============================================================
-        --><section id="cotizacion" class="py-16 sm:py-24 bg-bg-light border-t border-gray-100">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 
-                <!-- Encabezado de la Sección --><div class="text-center mb-12">
-                    <h2 class="section-title mx-auto animate-fadeInUp">Cotización Personalizada <span class="text-accent-blue">Online</span></h2>
-                    <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto animate-fadeInUp" style="animation-delay: 0.2s;">
-                        Rellena el siguiente formulario con los detalles de tu proyecto. Nuestros expertos te enviarán una cotización a medida.
-                    </p>
-                </div>
-
-                <!-- Contenedor Principal del Formulario con Diseño Moderno --><div class="bg-white p-6 sm:p-10 rounded-3xl shadow-2xl border-t-4 border-warm-gold animate-scaleIn" style="animation-delay: 0.4s;">
-
-                    <!-- Mensaje de Estado (Reemplazo de Alert) --><div id="form-status" class="hidden mb-6 p-4 rounded-xl text-white font-semibold transition-opacity duration-300 opacity-0" role="alert">
-                        <!-- Mensajes se insertarán aquí --></div>
-
-                    <form id="quote-form" class="space-y-8">
-
-                        <!-- SECCIÓN 1: DATOS PERSONALES Y DE CONTACTO --><fieldset class="border-b border-gray-200 pb-6">
-                            <legend class="text-xl font-bold text-primary-dark mb-4 border-l-4 pl-3 border-accent-blue font-display">1. Tu Contacto</legend>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                
-                                <div class="space-y-2">
-                                    <label for="full-name" class="block text-sm font-medium text-gray-700">Nombre Completo</label>
-                                    <input type="text" id="full-name" name="full-name" required
-                                        class="form-input-focus mt-1 block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-accent-blue focus:border-accent-blue transition duration-300 bg-white hover:border-gray-400"
-                                        placeholder="Ej: Juan Pérez">
-                                </div>
-
-                                <div class="space-y-2">
-                                    <label for="email" class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
-                                    <input type="email" id="email" name="email" required
-                                        class="form-input-focus mt-1 block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-accent-blue focus:border-accent-blue transition duration-300 bg-white hover:border-gray-400"
-                                        placeholder="ejemplo@correo.com">
-                                </div>
-                                
-                                <div class="space-y-2 md:col-span-2">
-                                    <label for="phone" class="block text-sm font-medium text-gray-700">Teléfono</label>
-                                    <input type="tel" id="phone" name="phone" required
-                                        class="form-input-focus mt-1 block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-accent-blue focus:border-accent-blue transition duration-300 bg-white hover:border-gray-400"
-                                        placeholder="Ej: +54 9 11 1234 5678">
-                                </div>
-
-                            </div>
-                        </fieldset>
-
-                        <!-- SECCIÓN 2: DETALLES DE LA ABERTURA (Con lógica condicional) --><fieldset class="border-b border-gray-200 pb-6">
-                            <legend class="text-xl font-bold text-primary-dark mb-4 border-l-4 pl-3 border-accent-blue font-display">2. Especificaciones</legend>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                                <div class="space-y-2">
-                                    <label for="product" class="block text-sm font-medium text-gray-700">Producto</label>
-                                    <select id="product" name="product" required
-                                        class="form-input-focus mt-1 block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-accent-blue focus:border-accent-blue transition duration-300 bg-white hover:border-gray-400">
-                                        <option value="" disabled selected>Seleccione el tipo de abertura</option>
-                                        <option value="Ventana Corrediza">Ventana Corrediza</option>
-                                        <option value="Ventana Oscilobatiente">Ventana Oscilobatiente</option>
-                                        <option value="Puerta Balcón">Puerta Balcón</option>
-                                        <option value="Puerta de Entrada">Puerta de Entrada</option>
-                                        <option value="Paño Fijo">Paño Fijo</option>
-                                        <option value="Otros">Otros (Especificar en comentarios)</option>
-                                    </select>
-                                </div>
-
-                                <div class="space-y-2">
-                                    <label for="material" class="block text-sm font-medium text-gray-700">Material</label>
-                                    <select id="material" name="material" required
-                                        class="form-input-focus mt-1 block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-accent-blue focus:border-accent-blue transition duration-300 bg-white hover:border-gray-400">
-                                        <option value="" disabled selected>Seleccione un material</option>
-                                        <option value="PVC">PVC</option>
-                                        <option value="ALUMINIO">ALUMINIO</option>
-                                    </select>
-                                </div>
-
-                                <div class="space-y-2">
-                                    <label for="color" class="block text-sm font-medium text-gray-700">Color</label>
-                                    <select id="color" name="color" required disabled
-                                        class="form-input-focus mt-1 block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-accent-blue focus:border-accent-blue transition duration-300 bg-white hover:border-gray-400">
-                                        <option value="" disabled selected>Seleccione material primero</option>
-                                    </select>
-                                </div>
-
-                                <div class="space-y-2">
-                                    <label for="height" class="block text-sm font-medium text-gray-700">Alto (cm)</label>
-                                    <input type="number" id="height" name="height" required min="10"
-                                        class="form-input-focus mt-1 block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-accent-blue focus:border-accent-blue transition duration-300 bg-white hover:border-gray-400"
-                                        placeholder="Ej: 210">
-                                </div>
-
-                                <div class="space-y-2">
-                                    <label for="width" class="block text-sm font-medium text-gray-700">Ancho (cm)</label>
-                                    <input type="number" id="width" name="width" required min="10"
-                                        class="form-input-focus mt-1 block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-accent-blue focus:border-accent-blue transition duration-300 bg-white hover:border-gray-400"
-                                        placeholder="Ej: 150">
-                                </div>
-                                
-                                <div class="space-y-2">
-                                    <label for="quantity" class="block text-sm font-medium text-gray-700">Cantidad</label>
-                                    <input type="number" id="quantity" name="quantity" required min="1" value="1"
-                                        class="form-input-focus mt-1 block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-accent-blue focus:border-accent-blue transition duration-300 bg-white hover:border-gray-400">
-                                </div>
-                                
-                                <div class="space-y-2 md:col-span-2">
-                                    <label for="installation-location" class="block text-sm font-medium text-gray-700">Lugar de Instalación</label>
-                                    <input type="text" id="installation-location" name="installation-location" required
-                                        class="form-input-focus mt-1 block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-accent-blue focus:border-accent-blue transition duration-300 bg-white hover:border-gray-400"
-                                        placeholder="Ciudad, Provincia (Ej: Córdoba, Córdoba)">
-                                </div>
-                            </div>
-                        </fieldset>
-                        
-                        <!-- SECCIÓN 3: COMENTARIOS ADICIONALES --><fieldset>
-                            <legend class="text-xl font-bold text-primary-dark mb-4 border-l-4 pl-3 border-accent-blue font-display">3. Comentarios</legend>
-                            <div class="space-y-2">
-                                <label for="comments" class="block text-sm font-medium text-gray-700">Notas Adicionales (Tipo de vidrio, detalles, etc.)</label>
-                                <textarea id="comments" name="comments" rows="4"
-                                    class="form-input-focus mt-1 block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-accent-blue focus:border-accent-blue transition duration-300 bg-white hover:border-gray-400"
-                                    placeholder="Ej: Me gustaría vidrio doble DVH 4-12-4. Es para una remodelación."></textarea>
-                            </div>
-                        </fieldset>
-
-                        <!-- Botón de Envío --><div class="pt-4 flex justify-center">
-                            <button type="submit" id="submit-button"
-                                class="btn-primary w-full sm:w-auto px-10 py-4 text-lg font-bold">
-                                Solicitar Cotización
-                            </button>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                    <div class="p-6 bg-white rounded-xl shadow-md">
+                        <div class="h-12 w-12 mx-auto bg-accent-blue rounded-full flex items-center justify-center text-white mb-4">
+                            <!-- Icono de Email -->
+                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-1 12H4a2 2 0 01-2-2V6a2 2 0 012-2h16a2 2 0 012 2v12a2 2 0 01-2 2z" /></svg>
                         </div>
-
-                    </form>
-                </div>
-            </div>
-        </section>
-
-        <!-- 
-            ============================================================
-            Sección 7: Contacto 
-            ============================================================
-        --><section id="contacto" class="py-20 bg-primary-dark text-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="section-title text-white animate-fadeInUp">Contáctenos</h2>
-                <p class="mt-4 mb-12 text-lg text-gray-300 animate-fadeInUp" style="animation-delay: 0.2s;">Estamos listos para escuchar tu proyecto. Deje su consulta y le responderemos a la brevedad.</p>
-
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                    <!-- Formulario de Contacto (simplificado, ya que hay uno de cotización) --><div class="bg-white p-8 md:p-10 rounded-2xl shadow-2xl animate-scaleIn" style="animation-delay: 0.4s;">
-                        <form id="contact-form" class="space-y-6">
-                            <div>
-                                <label for="contact-name" class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo</label>
-                                <input type="text" id="contact-name" name="contact-name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-accent-blue focus:border-accent-blue text-gray-900 shadow-sm">
-                            </div>
-                            <div>
-                                <label for="contact-email" class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
-                                <input type="email" id="contact-email" name="contact-email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-accent-blue focus:border-accent-blue text-gray-900 shadow-sm">
-                            </div>
-                            <div>
-                                <label for="contact-message" class="block text-sm font-medium text-gray-700 mb-1">Mensaje o Consulta</label>
-                                <textarea id="contact-message" name="contact-message" rows="4" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-accent-blue focus:border-accent-blue text-gray-900 shadow-sm"></textarea>
-                            </div>
-                            <div>
-                                <button type="submit" class="btn-primary w-full transition duration-300 ease-in-out">
-                                    Enviar Mensaje
-                                </button>
-                            </div>
-                        </form>
+                        <h3 class="text-lg font-bold text-primary-dark">Correo Electrónico</h3>
+                        <p class="mt-1 text-gray-600">contacto@durplass.com</p>
+                        <a href="mailto:contacto@durplass.com" class="text-accent-blue font-medium hover:text-warm-gold transition duration-200">Envía un mail</a>
                     </div>
-
-                    <!-- Información de Contacto --><div class="space-y-8 lg:mt-8 animate-fadeInUp" style="animation-delay: 0.6s;">
-                        <div class="flex items-start space-x-4">
-                            <svg class="h-8 w-8 text-warm-gold flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                            <div>
-                                <h4 class="text-xl font-semibold text-white font-display">Correo Electrónico</h4>
-                                <p class="text-gray-300">ventas@durplass.com.ar</p>
-                            </div>
+                    
+                    <div class="p-6 bg-white rounded-xl shadow-md">
+                        <div class="h-12 w-12 mx-auto bg-accent-blue rounded-full flex items-center justify-center text-white mb-4">
+                            <!-- Icono de Teléfono -->
+                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498A1 1 0 0121 16.72V19a2 2 0 01-2 2h-12a2 2 0 01-2-2v-7z" /></svg>
                         </div>
-
-                        <div class="flex items-start space-x-4">
-                            <svg class="h-8 w-8 text-warm-gold flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-                            <div>
-                                <h4 class="text-xl font-semibold text-white font-display">Teléfono</h4>
-                                <p class="text-gray-300">+54 9 11 1234 5678</p>
-                            </div>
+                        <h3 class="text-lg font-bold text-primary-dark">Llámanos</h3>
+                        <p class="mt-1 text-gray-600">Whatsapp: +54 9 11 XXXX-XXXX</p>
+                        <a href="tel:+54911xxxxxxxx" class="text-accent-blue font-medium hover:text-warm-gold transition duration-200">Llamada Rápida</a>
+                    </div>
+                    
+                    <div class="p-6 bg-white rounded-xl shadow-md">
+                        <div class="h-12 w-12 mx-auto bg-accent-blue rounded-full flex items-center justify-center text-white mb-4">
+                            <!-- Icono de Ubicación -->
+                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                         </div>
-
-                        <div class="flex items-start space-x-4">
-                            <svg class="h-8 w-8 text-warm-gold flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                            <div>
-                                <h4 class="text-xl font-semibold text-white font-display">Ubicación</h4>
-                                <p class="text-gray-300">Ruta 3, Km 30, Buenos Aires, Argentina</p>
-                            </div>
-                        </div>
+                        <h3 class="text-lg font-bold text-primary-dark">Ubicación</h3>
+                        <p class="mt-1 text-gray-600">Buenos Aires, Argentina</p>
+                        <a href="#" onclick="alert('La dirección exacta se proporciona al avanzar con el presupuesto.'); return false;" class="text-accent-blue font-medium hover:text-warm-gold transition duration-200">Ver Mapa</a>
                     </div>
                 </div>
             </div>
         </section>
-
     </main>
 
-    <!-- 
-        ============================================================
-        Pie de Página (Footer) 
-        ============================================================
-    --><footer class="bg-gray-900 text-white py-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center md:text-left">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Columna 1: Info General --><div>
-                    <h5 class="text-xl font-bold mb-4 text-warm-gold font-display">DURPLASS S.A.S.</h5>
-                    <p class="text-gray-400 text-sm">Especialistas en aberturas de PVC de alta prestación y soluciones de seguridad a medida.</p>
-                </div>
-
-                <!-- Columna 2: Navegación Rápida --><div>
-                    <h5 class="text-xl font-bold mb-4 text-warm-gold font-display">Enlaces Rápidos</h5>
-                    <ul class="space-y-2">
-                        <li><a href="#inicio" class="text-gray-400 hover:text-accent-blue transition duration-300">Inicio</a></li>
-                        <li><a href="#nosotros" class="text-gray-400 hover:text-accent-blue transition duration-300">Nosotros</a></li>
-                        <li><a href="#productos" class="text-gray-400 hover:text-accent-blue transition duration-300">Productos</a></li>
-                        <li><a href="#cotizacion" class="text-gray-400 hover:text-accent-blue transition duration-300">Cotización</a></li>
-                        <li><a href="#contacto" class="text-gray-400 hover:text-accent-blue transition duration-300">Contacto</a></li>
-                    </ul>
-                </div>
-
-                <!-- Columna 3: Legal y Contacto --><div>
-                    <h5 class="text-xl font-bold mb-4 text-warm-gold font-display">Legal & Contacto</h5>
-                    <p class="text-gray-400 text-sm">Política de Privacidad</p>
-                    <p class="text-gray-400 text-sm">Términos y Condiciones</p>
-                    <p class="text-gray-400 text-sm mt-4">Email: info@durplass.com.ar</p>
-                    <p class="text-gray-400 text-sm">Tel: +54 9 11 1234 5678</p>
-                </div>
-            </div>
-
-            <div class="mt-8 pt-6 border-t border-gray-700 text-center">
-                <p class="text-sm text-gray-500">© 2025 DURPLASS S.A.S. Todos los derechos reservados. Diseñado con pasión.</p>
-                <p id="user-id-display" class="text-xs text-gray-500 mt-1">ID de Usuario: Cargando...</p>
-            </div>
+    <!-- Pie de Página (Simple) -->
+    <footer class="bg-primary-dark border-t border-gray-700">
+        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-gray-400">&copy; 2025 DURPLASS S.A.S. Todos los derechos reservados.</p>
+            <p class="mt-2 text-gray-400">Diseño y Fabricación de Aberturas de Alta Performance.</p>
         </div>
     </footer>
+
+    <!-- Script para Toggle del Menú Móvil -->
+    <script>
+        document.getElementById('menu-button').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            if(mobileMenu) mobileMenu.classList.toggle('hidden');
+        });
+    </script>
 </body>
 </html>
