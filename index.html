@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DURPLASS S.A.S. | Aberturas de PVC y Puertas de Chapa a Medida</title>
+    <title>DURPLASS S.A.S. | Aberturas de PVC y Aluminio a Medida</title>
     <!-- Carga de Tailwind CSS para un diseño moderno y responsive -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Carga de íconos Lucide para una interfaz moderna -->
+    <!-- Carga de íconos Lucide -->
     <script type="module">
-      import { createIcons, Mail, Phone, MapPin, Menu, X, Factory, DollarSign, Target, Home } from 'https://cdn.jsdelivr.net/npm/lucide-esm@latest';
-      createIcons({ icons: { Mail, Phone, MapPin, Menu, X, Factory, DollarSign, Target, Home } });
+      import { createIcons, Mail, Phone, MapPin, Menu, X, Factory, DollarSign, Target, Home, Layers3, Brush } from 'https://cdn.jsdelivr.net/npm/lucide-esm@latest';
+      createIcons({ icons: { Mail, Phone, MapPin, Menu, X, Factory, DollarSign, Target, Home, Layers3, Brush } });
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     
@@ -19,7 +19,7 @@
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Globales para Firebase (Serán inicializadas en initializeFirebase)
+        // Variables globales para el estado de la aplicación
         let db;
         let auth;
         let userId = 'anonymous';
@@ -30,8 +30,34 @@
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         /**
-         * Inicializa Firebase, autentica al usuario (con token o anónimamente)
-         * y establece el ID de usuario.
+         * Función principal para cambiar la vista de la aplicación.
+         * @param {string} pageId - El ID de la sección a mostrar ('inicio-page' o 'presupuesto-page').
+         */
+        window.navigateTo = function(pageId) {
+            const pages = ['inicio-page', 'presupuesto-page'];
+            pages.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.classList.add('hidden');
+                }
+            });
+            const targetElement = document.getElementById(pageId);
+            if (targetElement) {
+                targetElement.classList.remove('hidden');
+                window.scrollTo(0, 0); // Ir al inicio de la nueva página
+            }
+
+            // Actualizar estado del menú
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('text-[var(--color-accent-blue)]');
+                if (link.dataset.page === pageId) {
+                    link.classList.add('text-[var(--color-accent-blue)]');
+                }
+            });
+        }
+        
+        /**
+         * Inicializa Firebase, autentica al usuario y establece el ID de usuario.
          */
         async function initializeFirebase() {
             try {
@@ -81,6 +107,45 @@
         }
 
         /**
+         * Maneja el cambio del selector de material y actualiza las opciones de color.
+         */
+        window.updateColorOptions = function() {
+            const materialSelect = document.getElementById('material');
+            const colorSelect = document.getElementById('color-perfil');
+            const selectedMaterial = materialSelect.value;
+
+            // Limpiar opciones anteriores
+            colorSelect.innerHTML = ''; 
+
+            if (selectedMaterial === 'pvc') {
+                // Opciones para PVC (Blanco, Negro, Símil Madera)
+                const pvcColors = [
+                    { value: 'blanco', text: 'Blanco (Estándar)' },
+                    { value: 'negro', text: 'Negro' },
+                    { value: 'similmadera', text: 'Símil Madera' },
+                    { value: 'otros', text: 'Otros (Especificar en detalles)' }
+                ];
+                pvcColors.forEach(color => {
+                    colorSelect.options.add(new Option(color.text, color.value));
+                });
+            } else if (selectedMaterial === 'aluminio') {
+                // Opciones para Aluminio (Blanco, Negro/Anodizado)
+                const aluminioColors = [
+                    { value: 'blanco', text: 'Blanco' },
+                    { value: 'negro', text: 'Negro' },
+                    { value: 'anodizadonatural', text: 'Anodizado Natural' },
+                    { value: 'otros', text: 'Otros (Especificar en detalles)' }
+                ];
+                aluminioColors.forEach(color => {
+                    colorSelect.options.add(new Option(color.text, color.value));
+                });
+            } else {
+                // Opción por defecto
+                 colorSelect.options.add(new Option('Seleccione primero el Material...', '', true, true));
+            }
+        }
+
+        /**
          * Maneja el envío del formulario y guarda la solicitud en Firestore.
          */
         window.saveBudgetRequest = async function(event) {
@@ -107,20 +172,22 @@
                 timestamp: serverTimestamp(),
                 userId: userId,
                 status: 'Pendiente',
-                ...data,
-                // Agregado de campos específicos del formulario detallado
-                tipoObra: data['tipo-obra'],
-                tipoCliente: data['tipo-cliente'],
-                productoPrincipal: data['producto-principal'],
-                cantidadEstimada: parseInt(data['cantidad-estimada'], 10) || 0,
-                colorPerfil: data['color-perfil'],
-                tipoVidrio: data['tipo-vidrio'],
-                detallesAdicionales: data['detalles-adicionales'],
-                // Datos de contacto
+                // Datos del formulario
                 nombre: data.nombre,
                 email: data.email,
                 telefono: data.telefono,
                 localidad: data.localidad,
+                tipoCliente: data['tipo-cliente'],
+                tipoObra: data['tipo-obra'],
+                
+                // Nuevos campos de especificación
+                material: data.material,
+                productoPrincipal: data['producto-principal'],
+                cantidadEstimada: parseInt(data['cantidad-estimada'], 10) || 0,
+                colorPerfil: data['color-perfil'],
+                tipoVidrio: data['tipo-vidrio'],
+                medidasEstimadas: data['medidas-estimadas'],
+                detallesAdicionales: data['detalles-adicionales'],
             };
 
             try {
@@ -132,14 +199,21 @@
 
                 showMessage('¡Solicitud de presupuesto enviada con éxito! Nos pondremos en contacto pronto.', 'bg-green-500');
                 form.reset(); // Limpia el formulario
+                window.updateColorOptions(); // Restablece la lista de colores
             } catch (error) {
                 console.error("Error al guardar la solicitud en Firestore: ", error);
-                showMessage(`Error al enviar la solicitud: ${error.message}`, 'bg-red-500');
+                // FIX: El mensaje de error era el problema, ahora debería ser más informativo
+                showMessage(`Error al enviar la solicitud (Ver consola): ${error.message}`, 'bg-red-500');
             }
         }
 
-        // Toggle mobile menu visibility
         document.addEventListener('DOMContentLoaded', () => {
+            // Inicializar la aplicación
+            initializeFirebase();
+            window.navigateTo('inicio-page'); // Mostrar la página de inicio por defecto
+            window.updateColorOptions(); // Inicializar las opciones de color
+
+            // Toggle mobile menu visibility
             const menuButton = document.getElementById('menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
 
@@ -149,15 +223,14 @@
                 });
             }
 
-            // Hide mobile menu when a link is clicked
-            document.querySelectorAll('#mobile-menu a, .main-nav a').forEach(item => {
-                item.addEventListener('click', () => {
-                    if(mobileMenu) mobileMenu.classList.add('hidden');
+            // Manejo de navegación en menú móvil y desktop
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    const pageId = e.currentTarget.dataset.page;
+                    window.navigateTo(pageId);
+                    if(mobileMenu) mobileMenu.classList.add('hidden'); // Ocultar después de navegar en móvil
                 });
             });
-
-             // Aplicar la función al cargar la ventana
-            initializeFirebase();
         });
     </script>
     
@@ -165,7 +238,7 @@
         /* Paleta de Colores DURPLASS inspirada en el logo (Marrón, Azul, Dorado) */
         :root {
             --color-primary-dark: #3A2A1A; /* Marrón Oscuro - Base del logo */
-            --color-accent-blue: #4A90E2; /* Azul - Ventanas/Acento */
+            --color-accent-blue: #0C7AFE; /* Azul Brillante - Ventanas/Acento, más llamativo */
             --color-warm-gold: #A07A48; /* Dorado - Acento Cálido */
             --color-bg-light: #F8F8F8; /* Fondo de Secciones */
             --color-text-main: #222;
@@ -182,32 +255,33 @@
             background-color: var(--color-accent-blue);
             color: var(--color-white);
             transition: all 0.3s ease;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 6px 15px -3px rgba(12, 122, 254, 0.4); /* Sombra azul más marcada */
         }
         .btn-primary:hover {
-            background-color: #387ac9; /* Un tono más oscuro */
+            background-color: #0060e2; /* Un tono más oscuro */
             transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 20px -5px rgba(12, 122, 254, 0.6);
         }
         
-        /* Estilo para el Hero Section (Fondo con imagen y overlay) */
-        #inicio {
-            background-image: url('https://placehold.co/1920x800/3A2A1A/ffffff?text=DURPLASS+PVC+y+Chapa');
+        /* Estilo para la portada (Hero Section) */
+        .hero-section {
+            /* Usando una imagen simulada más impactante con color de marca */
+            background-image: url('https://placehold.co/1920x800/0C7AFE/ffffff?text=DURPLASS+PVC+%26+ALUMINIO+PREMIUM');
             background-size: cover;
             background-position: center;
             position: relative;
         }
-        #inicio::before {
+        .hero-section::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.5); /* Oscurecer ligeramente para que el texto resalte */
+            background: rgba(0, 0, 0, 0.4); /* Oscurecer ligeramente para que el texto resalte */
             z-index: 1;
         }
-        #inicio > * { z-index: 2; position: relative; }
+        .hero-section > * { z-index: 2; position: relative; }
         
         /* Estilos específicos para el formulario */
         .form-group > label {
@@ -216,8 +290,8 @@
             margin-bottom: 0.25rem;
             display: block;
         }
-        .form-group input:not([type='radio']):not([type='checkbox']), 
         .form-group select, 
+        .form-group input:not([type='radio']):not([type='checkbox']), 
         .form-group textarea {
             width: 100%;
             padding: 0.75rem;
@@ -229,7 +303,7 @@
         .form-group select:focus, 
         .form-group textarea:focus {
             border-color: var(--color-accent-blue);
-            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+            box-shadow: 0 0 0 2px rgba(12, 122, 254, 0.2);
             outline: none;
         }
 
@@ -241,17 +315,16 @@
     <header class="sticky top-0 z-50 bg-white shadow-lg">
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
-                <!-- Logo de la Empresa (Se asume un logo con texto DURPLASS) -->
-                <a href="#inicio" class="text-2xl font-extrabold text-gray-900 tracking-wider">
+                <!-- Logo de la Empresa -->
+                <a href="#" onclick="navigateTo('inicio-page')" class="text-2xl font-extrabold text-[var(--color-primary-dark)] tracking-wider">
                     DURPLASS <span class="text-lg font-light text-[var(--color-accent-blue)]">S.A.S.</span>
                 </a>
                 
                 <!-- Menú Desktop -->
-                <div class="hidden md:flex space-x-8 main-nav">
-                    <a href="#inicio" class="text-gray-600 hover:text-[var(--color-accent-blue)] font-medium transition duration-150 ease-in-out">Inicio</a>
-                    <a href="#servicios" class="text-gray-600 hover:text-[var(--color-accent-blue)] font-medium transition duration-150 ease-in-out">Servicios</a>
-                    <a href="#presupuesto" class="text-gray-600 hover:text-[var(--color-accent-blue)] font-medium transition duration-150 ease-in-out">Presupuesto</a>
-                    <a href="#contacto" class="text-gray-600 hover:text-[var(--color-accent-blue)] font-medium transition duration-150 ease-in-out">Contacto</a>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#" data-page="inicio-page" class="nav-link text-gray-600 hover:text-[var(--color-accent-blue)] font-medium transition duration-150 ease-in-out text-[var(--color-accent-blue)]">Inicio</a>
+                    <a href="#" data-page="presupuesto-page" class="nav-link text-gray-600 hover:text-[var(--color-accent-blue)] font-medium transition duration-150 ease-in-out">Presupuesto</a>
+                    <a href="#contacto-section" class="text-gray-600 hover:text-[var(--color-accent-blue)] font-medium transition duration-150 ease-in-out">Contacto</a>
                 </div>
 
                 <!-- Botón de Menú para Móviles -->
@@ -263,70 +336,131 @@
 
         <!-- Menú Móvil (Oculto por defecto) -->
         <div class="hidden md:hidden" id="mobile-menu">
-            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 flex flex-col main-nav">
-                <a href="#inicio" class="text-gray-600 hover:bg-gray-50 hover:text-[var(--color-accent-blue)] px-3 py-2 rounded-md text-base font-medium">Inicio</a>
-                <a href="#servicios" class="text-gray-600 hover:bg-gray-50 hover:text-[var(--color-accent-blue)] px-3 py-2 rounded-md text-base font-medium">Servicios</a>
-                <a href="#presupuesto" class="text-gray-600 hover:bg-gray-50 hover:text-[var(--color-accent-blue)] px-3 py-2 rounded-md text-base font-medium">Presupuesto</a>
-                <a href="#contacto" class="text-gray-600 hover:bg-gray-50 hover:text-[var(--color-accent-blue)] px-3 py-2 rounded-md text-base font-medium">Contacto</a>
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 flex flex-col">
+                <a href="#" data-page="inicio-page" class="nav-link text-gray-600 hover:bg-gray-50 hover:text-[var(--color-accent-blue)] px-3 py-2 rounded-md text-base font-medium text-[var(--color-accent-blue)]">Inicio</a>
+                <a href="#" data-page="presupuesto-page" class="nav-link text-gray-600 hover:bg-gray-50 hover:text-[var(--color-accent-blue)] px-3 py-2 rounded-md text-base font-medium">Presupuesto</a>
+                <a href="#contacto-section" class="text-gray-600 hover:bg-gray-50 hover:text-[var(--color-accent-blue)] px-3 py-2 rounded-md text-base font-medium">Contacto</a>
             </div>
         </div>
     </header>
 
     <main>
-        <!-- Sección 1: Inicio (Moderno y Atractivo) -->
-        <section id="inicio" class="h-[60vh] sm:h-[80vh] flex items-center justify-center text-center">
-            <div class="text-white p-6 sm:p-12 rounded-lg backdrop-blur-sm bg-black/30">
-                <h1 class="text-4xl sm:text-6xl font-extrabold mb-4 drop-shadow-lg">
-                    Construimos la Calidad que Perdura
-                </h1>
-                <p class="text-xl sm:text-2xl font-light mb-8 drop-shadow-md max-w-2xl mx-auto">
-                    Aberturas de PVC y Puertas de Chapa a Medida. Innovación y Resistencia para tu Obra.
-                </p>
-                <a href="#presupuesto" class="inline-block px-8 py-3 rounded-xl text-lg font-semibold btn-primary">
-                    Solicitar Presupuesto
-                </a>
+        <!-- VISTA 1: PÁGINA PRINCIPAL (INICIO + SERVICIOS + CONTACTO - Todo en una sola vista) -->
+        <section id="inicio-page" class="transition-all duration-500">
+            <!-- Sección 1: Portada Brillante (Hero Section) -->
+            <div class="hero-section h-[70vh] flex items-center justify-center text-center">
+                <div class="text-white p-6 sm:p-12 rounded-xl backdrop-blur-sm bg-black/40 shadow-2xl">
+                    <p class="text-lg font-light mb-3 tracking-widest uppercase">Tecnología y Aislamiento</p>
+                    <h1 class="text-5xl sm:text-7xl font-extrabold mb-5 drop-shadow-xl leading-tight">
+                        DURPLASS: Aberturas de Excelencia
+                    </h1>
+                    <p class="text-xl sm:text-2xl font-light mb-10 drop-shadow-lg max-w-4xl mx-auto">
+                        Fabricamos la solución perfecta en PVC y Aluminio para la Patagonia y todo Argentina, desde nuestra fábrica en Buenos Aires.
+                    </p>
+                    <a href="#" onclick="navigateTo('presupuesto-page')" class="inline-block px-10 py-4 rounded-xl text-lg font-semibold btn-primary uppercase tracking-wider">
+                        <icon name="DollarSign" size="20" class="inline mr-2"></icon>
+                        Cotizar Ahora
+                    </a>
+                </div>
+            </div>
+
+            <!-- Sección 2: Servicios/Productos Destacados -->
+            <div id="servicios-section" class="py-16 sm:py-24 bg-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center mb-16">
+                        <h2 class="text-4xl font-extrabold text-[var(--color-primary-dark)] mb-4">Nuestras Soluciones</h2>
+                        <p class="text-xl text-gray-600 max-w-3xl mx-auto">Calidad, diseño y la resistencia que su proyecto requiere.</p>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-3 gap-10">
+                        <!-- Tarjeta 1: Aberturas de PVC -->
+                        <div class="bg-[var(--color-bg-light)] p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 transform hover:scale-[1.02] border-t-4 border-[var(--color-accent-blue)]">
+                            <icon name="Layers3" size="36" class="text-[var(--color-accent-blue)] mb-4"></icon>
+                            <h3 class="text-2xl font-semibold mb-3 text-[var(--color-primary-dark)]">Aberturas de PVC</h3>
+                            <p class="text-gray-600">Líderes en aislamiento térmico y acústico. Ideales para el clima extremo de la Patagonia, garantizando eficiencia energética.</p>
+                        </div>
+
+                        <!-- Tarjeta 2: Aberturas de Aluminio -->
+                        <div class="bg-[var(--color-bg-light)] p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 transform hover:scale-[1.02] border-t-4 border-[var(--color-primary-dark)]">
+                            <icon name="Home" size="36" class="text-[var(--color-primary-dark)] mb-4"></icon>
+                            <h3 class="text-2xl font-semibold mb-3 text-[var(--color-primary-dark)]">Aberturas de Aluminio</h3>
+                            <p class="text-gray-600">Perfiles robustos, diseño moderno y gran resistencia estructural. Amplia variedad de acabados y líneas.</p>
+                        </div>
+
+                        <!-- Tarjeta 3: Logística y Asesoramiento -->
+                        <div class="bg-[var(--color-bg-light)] p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 transform hover:scale-[1.02] border-t-4 border-[var(--color-warm-gold)]">
+                             <icon name="Factory" size="36" class="text-[var(--color-warm-gold)] mb-4"></icon>
+                            <h3 class="text-2xl font-semibold mb-3 text-[var(--color-primary-dark)]">Logística Nacional</h3>
+                            <p class="text-gray-600">Fabricación centralizada en Tristán Suárez (BA) y distribución eficiente, con foco en el servicio a la Patagonia (Ushuaia).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 3: Contacto (Información de Ubicaciones) -->
+            <div id="contacto-section" class="py-16 sm:py-24 bg-[var(--color-bg-light)]">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center mb-12">
+                        <h2 class="text-4xl font-extrabold text-[var(--color-primary-dark)] mb-4">Contáctenos</h2>
+                        <p class="text-xl text-gray-600">Dos puntos estratégicos para un servicio integral.</p>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-10">
+                        <!-- Contacto 1: Oficina de Ventas (Ushuaia) -->
+                        <div class="bg-white p-8 rounded-xl shadow-xl border-b-4 border-[var(--color-accent-blue)]">
+                            <icon name="MapPin" size="36" class="text-[var(--color-accent-blue)] mb-4"></icon>
+                            <h3 class="text-2xl font-semibold mb-3 text-[var(--color-primary-dark)]">Oficina Central de Ventas</h3>
+                            <p class="text-xl font-bold mb-4 text-[var(--color-accent-blue)]">Ushuaia, Tierra del Fuego</p>
+                            
+                            <ul class="space-y-3 text-gray-700">
+                                <li>
+                                    <icon name="MapPin" size="18" class="inline mr-2 text-gray-500"></icon>
+                                    Av. San Martín 1500 (Dirección Mock)
+                                </li>
+                                <li>
+                                    <icon name="Phone" size="18" class="inline mr-2 text-gray-500"></icon>
+                                    **Teléfono Ventas:** (02901) 42-XXXX (Placeholder)
+                                </li>
+                                <li>
+                                    <icon name="Mail" size="18" class="inline mr-2 text-gray-500"></icon>
+                                    **Email Ventas:** <a href="mailto:ventas@durplass.com.ar" class="text-[var(--color-accent-blue)] hover:underline">ventas@durplass.com.ar</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Contacto 2: Fábrica de Producción (Tristán Suárez) -->
+                        <div class="bg-white p-8 rounded-xl shadow-xl border-b-4 border-[var(--color-primary-dark)]">
+                            <icon name="Factory" size="36" class="text-[var(--color-primary-dark)] mb-4"></icon>
+                            <h3 class="text-2xl font-semibold mb-3 text-[var(--color-primary-dark)]">Fábrica y Logística</h3>
+                            <p class="text-xl font-bold mb-4 text-[var(--color-primary-dark)]">Tristán Suárez, Buenos Aires</p>
+                            
+                            <ul class="space-y-3 text-gray-700">
+                                <li>
+                                    <icon name="MapPin" size="18" class="inline mr-2 text-gray-500"></icon>
+                                    Ruta 205 Km 42 (Dirección Mock)
+                                </li>
+                                <li>
+                                    <icon name="Phone" size="18" class="inline mr-2 text-gray-500"></icon>
+                                    **Teléfono Fábrica:** (011) 43-XXXX (Placeholder)
+                                </li>
+                                <li>
+                                    <icon name="Mail" size="18" class="inline mr-2 text-gray-500"></icon>
+                                    **Email General:** <a href="mailto:info@durplass.com.ar" class="text-[var(--color-accent-blue)] hover:underline">info@durplass.com.ar</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- Sección 2: Servicios/Productos Destacados -->
-        <section id="servicios" class="py-16 sm:py-24 bg-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-16">
-                    <h2 class="text-4xl font-extrabold text-[var(--color-primary-dark)] mb-4">Nuestros Servicios</h2>
-                    <p class="text-xl text-gray-600 max-w-3xl mx-auto">Soluciones integrales con la más alta calidad y tecnología.</p>
-                </div>
-                
-                <div class="grid md:grid-cols-3 gap-10">
-                    <!-- Tarjeta 1: Aberturas de PVC -->
-                    <div class="bg-[var(--color-bg-light)] p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 transform hover:scale-[1.02]">
-                        <icon name="Home" size="36" class="text-[var(--color-accent-blue)] mb-4"></icon>
-                        <h3 class="text-2xl font-semibold mb-3 text-[var(--color-primary-dark)]">Aberturas de PVC</h3>
-                        <p class="text-gray-600">Máximo aislamiento térmico y acústico, durabilidad inigualable y cero mantenimiento. Ideal para eficiencia energética.</p>
-                    </div>
 
-                    <!-- Tarjeta 2: Puertas de Chapa a Medida -->
-                    <div class="bg-[var(--color-bg-light)] p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 transform hover:scale-[1.02]">
-                         <icon name="Target" size="36" class="text-[var(--color-accent-blue)] mb-4"></icon>
-                        <h3 class="text-2xl font-semibold mb-3 text-[var(--color-primary-dark)]">Puertas de Chapa Reforzadas</h3>
-                        <p class="text-gray-600">Diseños personalizados y seguridad robusta. Fabricadas con los mejores materiales, adaptándose a cualquier requerimiento.</p>
-                    </div>
-
-                    <!-- Tarjeta 3: Asesoramiento y Colocación -->
-                    <div class="bg-[var(--color-bg-light)] p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 transform hover:scale-[1.02]">
-                         <icon name="Factory" size="36" class="text-[var(--color-accent-blue)] mb-4"></icon>
-                        <h3 class="text-2xl font-semibold mb-3 text-[var(--color-primary-dark)]">Fabricación y Logística</h3>
-                        <p class="text-gray-600">Proceso de producción optimizado en nuestra fábrica y servicio de entrega a todo el país, incluyendo la Patagonia.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Sección 3: Formulario de Presupuesto (COMPLETO Y OPTIMIZADO) -->
-        <section id="presupuesto" class="py-16 sm:py-24 bg-[var(--color-bg-light)]">
+        <!-- VISTA 2: PÁGINA DE PRESUPUESTO (Oculta por defecto) -->
+        <section id="presupuesto-page" class="py-16 sm:py-24 bg-[var(--color-bg-light)] hidden transition-all duration-500">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-12">
                     <h2 class="text-4xl font-extrabold text-[var(--color-primary-dark)] mb-4">Solicitud de Presupuesto Detallado</h2>
-                    <p class="text-xl text-gray-600">Complete el formulario y cotice sus aberturas y puertas a medida.</p>
+                    <p class="text-xl text-gray-600">Seleccione el material, configure su producto y reciba su cotización sin compromiso.</p>
                 </div>
 
                 <!-- Mensaje de Estado (Para errores de validación o éxito) -->
@@ -383,36 +517,43 @@
                             </div>
                         </fieldset>
 
-                        <!-- Grupo 2: Especificaciones del Producto -->
+                        <!-- Grupo 2: Especificaciones del Producto (LÓGICA CRÍTICA) -->
                         <fieldset class="border border-gray-200 p-6 rounded-lg space-y-6">
                             <legend class="text-xl font-bold text-[var(--color-accent-blue)] px-2">2. Especificaciones de Aberturas</legend>
                             
                             <div class="grid md:grid-cols-3 gap-6">
+                                <!-- Campo de Material (PVC o ALUMINIO) -->
                                 <div class="form-group">
-                                    <label for="producto-principal">Producto Principal <span class="text-red-500">*</span></label>
+                                    <label for="material">Material Principal <span class="text-red-500">*</span></label>
+                                    <select id="material" name="material" onchange="updateColorOptions()" required>
+                                        <option value="">Seleccione Material...</option>
+                                        <option value="pvc">PVC</option>
+                                        <option value="aluminio">ALUMINIO</option>
+                                        <option value="puertachapa">PUERTA DE CHAPA (a medida)</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Opciones de Producto -->
+                                <div class="form-group">
+                                    <label for="producto-principal">Tipo de Producto <span class="text-red-500">*</span></label>
                                     <select id="producto-principal" name="producto-principal" required>
-                                        <option value="">Seleccione...</option>
-                                        <option value="pvccorrediza">Ventana de PVC Corrediza</option>
-                                        <option value="pvcoscilo">Ventana de PVC Oscilo-Batiente</option>
-                                        <option value="pvcfija">Ventana de PVC Fija</option>
-                                        <option value="puertachapa">Puerta de Chapa a Medida</option>
-                                        <option value="pvcpuerta">Puerta Balcón de PVC</option>
-                                        <option value="otros">Otros (Detallar abajo)</option>
+                                        <option value="">Seleccione Producto...</option>
+                                        <option value="corrediza">Corrediza</option>
+                                        <option value="oscilobatiente">Oscilo-Batiente</option>
+                                        <option value="fija">Fija / Paño Fijo</option>
+                                        <option value="puerta">Puerta Balcón / de Acceso</option>
+                                        <option value="otros">Otros</option>
                                     </select>
                                 </div>
+                                
+                                <!-- Opciones de Color (Cambian con la función JS) -->
                                 <div class="form-group">
-                                    <label for="cantidad-estimada">Cantidad Estimada</label>
-                                    <input type="number" id="cantidad-estimada" name="cantidad-estimada" min="1" placeholder="Ej: 5">
-                                </div>
-                                <div class="form-group">
-                                    <label for="color-perfil">Color de Perfil (PVC/Chapa)</label>
-                                    <select id="color-perfil" name="color-perfil">
-                                        <option value="blanco">Blanco</option>
-                                        <option value="negro">Negro</option>
-                                        <option value="similmadera">Símil Madera</option>
-                                        <option value="otros">Otros (Especificar)</option>
+                                    <label for="color-perfil">Color de Perfil <span class="text-red-500">*</span></label>
+                                    <select id="color-perfil" name="color-perfil" required>
+                                        <option value="">Seleccione primero el Material...</option>
                                     </select>
                                 </div>
+                                
                                 <div class="form-group">
                                     <label for="tipo-vidrio">Tipo de Vidrio</label>
                                     <select id="tipo-vidrio" name="tipo-vidrio">
@@ -420,17 +561,24 @@
                                         <option value="dvh494">Doble Vidrio Hermético (DVH 4/9/4)</option>
                                         <option value="dvhotros">DVH (Otras configuraciones)</option>
                                         <option value="laminado">Laminado de Seguridad</option>
+                                        <option value="triplice">Triple Vidriado Hermético (TVH)</option>
                                     </select>
                                 </div>
-                                <div class="form-group md:col-span-2">
-                                    <label for="medidas-estimadas">Medidas Estimadas (Ancho x Alto)</label>
+                                
+                                <div class="form-group">
+                                    <label for="cantidad-estimada">Cantidad Estimada</label>
+                                    <input type="number" id="cantidad-estimada" name="cantidad-estimada" min="1" placeholder="Ej: 5">
+                                </div>
+
+                                <div class="form-group md:col-span-1">
+                                    <label for="medidas-estimadas">Medidas Principales (Ancho x Alto)</label>
                                     <input type="text" id="medidas-estimadas" name="medidas-estimadas" placeholder="Ej: 1500mm x 1200mm, o listar principales">
                                 </div>
                             </div>
                             
                             <div class="form-group">
                                 <label for="detalles-adicionales">Detalles Adicionales y Requerimientos Especiales</label>
-                                <textarea id="detalles-adicionales" name="detalles-adicionales" rows="4" placeholder="Indique tipos de apertura, cantidad total de aberturas, persianas, mosquiteros u otros detalles relevantes..."></textarea>
+                                <textarea id="detalles-adicionales" name="detalles-adicionales" rows="4" placeholder="Indique el total de aberturas, persianas, mosquiteros u otros detalles que ayuden a la cotización..."></textarea>
                             </div>
                         </fieldset>
 
@@ -445,75 +593,18 @@
             </div>
         </section>
 
-        <!-- Sección 4: Contacto (Información de Ubicaciones) -->
-        <section id="contacto" class="py-16 sm:py-24 bg-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-12">
-                    <h2 class="text-4xl font-extrabold text-[var(--color-primary-dark)] mb-4">Contáctenos</h2>
-                    <p class="text-xl text-gray-600">Tenemos dos puntos clave para brindarle el mejor servicio.</p>
-                </div>
-
-                <div class="grid md:grid-cols-2 gap-10">
-                    <!-- Contacto 1: Oficina de Ventas (Ushuaia) -->
-                    <div class="bg-[var(--color-bg-light)] p-8 rounded-xl shadow-xl border-t-4 border-[var(--color-accent-blue)]">
-                        <icon name="MapPin" size="36" class="text-[var(--color-accent-blue)] mb-4"></icon>
-                        <h3 class="text-2xl font-semibold mb-3 text-[var(--color-primary-dark)]">Oficina Central de Ventas</h3>
-                        <p class="text-xl font-bold mb-4">Ushuaia, Tierra del Fuego</p>
-                        
-                        <ul class="space-y-3 text-gray-700">
-                            <li>
-                                <icon name="MapPin" size="18" class="inline mr-2 text-gray-500"></icon>
-                                Av. San Martín 1500 (Dirección Mock)
-                            </li>
-                            <li>
-                                <icon name="Phone" size="18" class="inline mr-2 text-gray-500"></icon>
-                                **Teléfono Ventas:** (02901) 42-XXXX (Placeholder)
-                            </li>
-                            <li>
-                                <icon name="Mail" size="18" class="inline mr-2 text-gray-500"></icon>
-                                **Email Ventas:** <a href="mailto:ventas@durplass.com.ar" class="text-[var(--color-accent-blue)] hover:underline">ventas@durplass.com.ar</a>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <!-- Contacto 2: Fábrica de Producción (Tristán Suárez) -->
-                    <div class="bg-[var(--color-bg-light)] p-8 rounded-xl shadow-xl border-t-4 border-[var(--color-primary-dark)]">
-                        <icon name="Factory" size="36" class="text-[var(--color-primary-dark)] mb-4"></icon>
-                        <h3 class="text-2xl font-semibold mb-3 text-[var(--color-primary-dark)]">Fábrica y Logística</h3>
-                        <p class="text-xl font-bold mb-4">Tristán Suárez, Buenos Aires</p>
-                        
-                        <ul class="space-y-3 text-gray-700">
-                            <li>
-                                <icon name="MapPin" size="18" class="inline mr-2 text-gray-500"></icon>
-                                Ruta 205 Km 42 (Dirección Mock)
-                            </li>
-                            <li>
-                                <icon name="Phone" size="18" class="inline mr-2 text-gray-500"></icon>
-                                **Teléfono Fábrica:** (011) 43-XXXX (Placeholder)
-                            </li>
-                            <li>
-                                <icon name="Mail" size="18" class="inline mr-2 text-gray-500"></icon>
-                                **Email General:** <a href="mailto:info@durplass.com.ar" class="text-[var(--color-accent-blue)] hover:underline">info@durplass.com.ar</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-
     </main>
 
-    <!-- Footer -->
+    <!-- Footer (Fuera de las secciones de página para que aparezca en ambas vistas) -->
     <footer class="bg-[var(--color-primary-dark)] text-white py-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <p class="text-lg font-bold mb-2">DURPLASS S.A.S. | Aberturas y Soluciones Constructivas</p>
             <div class="flex flex-col sm:flex-row justify-center space-y-2 sm:space-y-0 sm:space-x-8 text-sm text-gray-300 mb-4">
-                <a href="#inicio" class="hover:text-[var(--color-warm-gold)]">Inicio</a>
-                <a href="#servicios" class="hover:text-[var(--color-warm-gold)]">Servicios</a>
-                <a href="#presupuesto" class="hover:text-[var(--color-warm-gold)]">Presupuesto</a>
-                <a href="#contacto" class="hover:text-[var(--color-warm-gold)]">Contacto</a>
+                <a href="#" onclick="navigateTo('inicio-page')" class="nav-link hover:text-[var(--color-warm-gold)]">Inicio</a>
+                <a href="#" onclick="navigateTo('presupuesto-page')" class="nav-link hover:text-[var(--color-warm-gold)]">Presupuesto</a>
+                <a href="#contacto-section" class="hover:text-[var(--color-warm-gold)]">Contacto</a>
             </div>
-             <p class="text-xs text-gray-400">© 2025 DURPLASS S.A.S. Todos los derechos reservados. | Fábrica en Tristán Suárez, BA. | Ventas en Ushuaia, TDF.</p>
+             <p class="text-xs text-gray-400">© 2025 DURPLASS S.A.S. Todos los derechos reservados. | Fábrica en Tristán Suárez, BA. | Ventas en Ushuaia, TDF. | ID de Sesión: ${userId}</p>
         </div>
     </footer>
 
