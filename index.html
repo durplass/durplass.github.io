@@ -3,97 +3,576 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DURPLASS S.A.S. | Aberturas de PVC y Aluminio a Medida</title>
+    <title>DURPLASS S.A.S. | Aberturas de PVC y Puertas de Chapa a Medida</title>
     <!-- Carga de Tailwind CSS para un diseño moderno y responsive -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Carga de íconos Lucide -->
-    <script type="module">
-      import { createIcons, Mail, Phone, MapPin, Menu, X, Factory, DollarSign, Target, Home, Layers3, Brush } from 'https://cdn.jsdelivr.net/npm/lucide-esm@latest';
-      createIcons({ icons: { Mail, Phone, MapPin, Menu, X, Factory, DollarSign, Target, Home, Layers3, Brush } });
-    </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Importaciones de Firebase (Firestore y Auth) -->
+    <!-- Importaciones de Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, collection, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Variables globales para el estado de la aplicación
-        let db;
-        let auth;
-        let userId = 'anonymous';
+        // Configuración de Tailwind para usar colores corporativos
+        window.tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-dark': '#3A2A1A', /* Marrón Oscuro - Base del logo (Color Original) */
+                        'accent-blue': '#4A90E2', /* Azul - Ventanas/Acento (Color Original) */
+                        'warm-gold': '#A07A48', /* Dorado - Acento Cálido (Color Original) */
+                        'bg-light': '#F8F8F8', /* Fondo de Secciones */
+                        'text-main': '#222',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                },
+            }
+        }
 
-        // Constantes del entorno (MANDATORIO)
+        // Variables globales (Accedidas desde window)
+        window.db = null;
+        window.auth = null;
+        window.userId = null;
+        window.isAuthReady = false;
+
+        setLogLevel('Debug'); // Habilitar logs para depuración de Firestore
+
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         /**
-         * Función principal para cambiar la vista de la aplicación.
-         * @param {string} pageId - El ID de la sección a mostrar ('inicio-page' o 'presupuesto-page').
+         * Inicializa Firebase, autentica al usuario y prepara Firestore.
          */
-        window.navigateTo = function(pageId) {
-            const pages = ['inicio-page', 'presupuesto-page'];
-            pages.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.classList.add('hidden');
-                }
-            });
-            const targetElement = document.getElementById(pageId);
-            if (targetElement) {
-                targetElement.classList.remove('hidden');
-                window.scrollTo(0, 0); // Ir al inicio de la nueva página
+        window.initializeFirebase = async () => {
+            try {
+                const app = initializeApp(firebaseConfig);
+                window.db = getFirestore(app);
+                window.auth = getAuth(app);
+
+                onAuthStateChanged(window.auth, async (user) => {
+                    if (user) {
+                        window.userId = user.uid;
+                        console.log("Usuario autenticado:", window.userId);
+                    } else {
+                        // Si no hay usuario, intentar firmar de forma anónima si no se usó el token
+                        if (initialAuthToken) {
+                            try {
+                                const userCredential = await signInWithCustomToken(window.auth, initialAuthToken);
+                                window.userId = userCredential.user.uid;
+                                console.log("Autenticación con Custom Token exitosa:", window.userId);
+                            } catch (error) {
+                                console.error("Error al iniciar sesión con Custom Token:", error);
+                                // Fallback a anónimo si el token falla
+                                const userCredential = await signInAnonymously(window.auth);
+                                window.userId = userCredential.user.uid;
+                                console.log("Autenticación anónima por fallback:", window.userId);
+                            }
+                        } else {
+                            // Sin token, iniciar sesión anónimamente
+                            const userCredential = await signInAnonymously(window.auth);
+                            window.userId = userCredential.user.uid;
+                            console.log("Autenticación anónima:", window.userId);
+                        }
+                    }
+                    window.isAuthReady = true;
+                    console.log("Firebase listo. User ID:", window.userId);
+                    // Opcional: Cargar datos iniciales o actualizar la UI aquí
+                });
+            } catch (e) {
+                console.error("Error al inicializar Firebase:", e);
+                // Si Firebase falla, al menos la UI debe cargar.
+            }
+        };
+
+        // Exportar la función de guardar datos para que el JS normal pueda acceder.
+        window.saveBudgetRequest = async (data) => {
+            if (!window.db || !window.isAuthReady || !window.userId) {
+                showMessage("Sistema no inicializado. Intente de nuevo.", 'bg-red-500');
+                console.error("No se puede guardar: DB no inicializada o usuario no autenticado.");
+                return;
             }
 
-            // Actualizar estado del menú
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.remove('text-[var(--color-accent-blue)]');
-                if (link.dataset.page === pageId) {
-                    link.classList.add('text-[var(--color-accent-blue)]');
-                }
-            });
+            const path = `artifacts/${appId}/public/data/budget_requests`;
+            const docRef = doc(collection(window.db, path)); // Firestore asigna un ID automáticamente
+
+            const requestData = {
+                ...data,
+                userId: window.userId,
+                timestamp: serverTimestamp(),
+            };
+
+            try {
+                await setDoc(docRef, requestData);
+                showMessage("¡Solicitud enviada con éxito! Pronto nos contactaremos.", 'bg-green-500');
+                console.log("Solicitud de presupuesto guardada con éxito:", docRef.id);
+                return true;
+            } catch (error) {
+                showMessage("Error al enviar la solicitud. Verifique su conexión.", 'bg-red-500');
+                console.error("Error guardando documento:", error);
+                return false;
+            }
+        };
+
+        window.searchProducts = async (term) => {
+            if (!window.db || !window.isAuthReady) {
+                console.error("No se puede buscar: DB no inicializada.");
+                return [];
+            }
+            const products = [];
+            try {
+                // Asumiendo que existe una colección pública de productos
+                const productsRef = collection(window.db, `artifacts/${appId}/public/data/products`);
+                
+                // Nota: Firestore es limitado para búsquedas de texto completo. 
+                // Usaremos una consulta simple de ejemplo.
+                const q = query(productsRef, where("tags", "array-contains", term.toLowerCase()));
+                const querySnapshot = await getDocs(q);
+
+                querySnapshot.forEach((doc) => {
+                    products.push(doc.data());
+                });
+            } catch (error) {
+                console.error("Error al buscar productos:", error);
+            }
+            return products;
+        };
+
+        window.initializeApp = initializeApp; // Asegurar que la función esté disponible globalmente
+    </script>
+
+    <style>
+        /* Estilos base para el diseño profesional */
+        html { scroll-behavior: smooth; }
+        body { color: #222; font-family: 'Inter', sans-serif; }
+        .hero-bg {
+            background-image: url('https://placehold.co/1920x800/3A2A1A/ffffff?text=Fondo+de+Duplass+S.A.S.+Profesional'); 
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed; /* Efecto Parallax Ligero */
         }
+        /* Estilo para el botón flotante de WhatsApp */
+        .whatsapp-float {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            bottom: 40px;
+            right: 40px;
+            background-color: #25D366; /* Color de WhatsApp */
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            font-size: 30px;
+            box-shadow: 2px 2px 3px #999;
+            z-index: 1000;
+            line-height: 60px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+            box-shadow: 3px 3px 5px #777;
+        }
+
+        /* Estilo para el botón flotante de Chatbot */
+        .chatbot-float {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            bottom: 120px; /* Separado del botón de WP */
+            right: 40px;
+            background-color: #4A90E2; /* Color Accent Blue */
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            font-size: 28px;
+            box-shadow: 2px 2px 3px #999;
+            z-index: 1000;
+            line-height: 60px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        .chatbot-float:hover {
+            transform: scale(1.1);
+            box-shadow: 3px 3px 5px #777;
+        }
+
+        /* Estilo para inputs de formulario avanzado */
+        .form-input {
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .form-input:focus {
+            border-color: #4A90E2;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.5); /* Sombra azul para foco */
+        }
+    </style>
+</head>
+<body class="bg-white">
+
+    <!-- BOTÓN FLOTANTE DE WHATSAPP -->
+    <a href="https://wa.me/5491100000000?text=Hola,%20quisiera%20pedir%20un%20presupuesto%20para%20aberturas." target="_blank" class="whatsapp-float flex items-center justify-center" aria-label="Contactar por WhatsApp">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M2.003 5.884L10 10.74 17.997 5.884A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+            <path d="M18 8.118l-8 4.71-8-4.71V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+        </svg>
+    </a>
+
+    <!-- BOTÓN FLOTANTE DE CHATBOT/ASISTENTE -->
+    <button id="chatbot-button" class="chatbot-float flex items-center justify-center" aria-label="Abrir Asistente Virtual">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M21 15a2 2 0 01-2 2H7l-4 4V7a2 2 0 012-2h14a2 2 0 012 2v8z" />
+        </svg>
+    </button>
+    
+    <!-- MODAL DEL CHATBOT/ASISTENTE -->
+    <div id="chatbot-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 hidden flex items-center justify-center z-[1001] p-4 transition-opacity duration-300">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm transform transition-all duration-300 scale-95 md:scale-100">
+            <div class="bg-primary-dark text-white p-4 rounded-t-xl flex justify-between items-center">
+                <h3 class="text-lg font-bold">Asistente Virtual DURPLASS</h3>
+                <button onclick="closeChatbotModal()" class="text-white hover:text-gray-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div id="chatbot-body" class="p-4 space-y-3 h-80 overflow-y-auto">
+                <!-- Mensajes del Chatbot -->
+                <div class="flex justify-start">
+                    <div class="bg-gray-200 p-3 rounded-xl max-w-[80%] shadow-md">
+                        <p class="text-sm">¡Hola! Soy tu asistente de DURPLASS. Puedo ayudarte con:</p>
+                        <div class="mt-2 space-y-2">
+                            <button onclick="handleChatbotAction('presupuesto')" class="w-full text-left bg-accent-blue text-white text-xs px-2 py-1 rounded hover:bg-opacity-80 transition">1. Solicitar Presupuesto</button>
+                            <button onclick="handleChatbotAction('productos')" class="w-full text-left bg-accent-blue text-white text-xs px-2 py-1 rounded hover:bg-opacity-80 transition">2. Ver Productos</button>
+                            <button onclick="handleChatbotAction('whatsapp')" class="w-full text-left bg-accent-blue text-white text-xs px-2 py-1 rounded hover:bg-opacity-80 transition">3. Contacto Directo WP</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 border-t border-gray-200">
+                <p class="text-xs text-center text-gray-500">¿Cómo puedo guiarte hoy?</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- CABECERA/NAVBAR -->
+    <header class="sticky top-0 z-50 bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo con Color Original -->
+                <a href="#inicio" class="flex-shrink-0 flex items-center">
+                    <span class="text-3xl font-extrabold" style="color: #3A2A1A;">DURPLASS</span>
+                    <span class="text-3xl font-extrabold" style="color: #4A90E2;">.S.A.S.</span>
+                </a>
+
+                <!-- Menú Desktop -->
+                <nav class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#inicio" class="text-primary-dark font-medium hover:text-accent-blue px-3 py-2 rounded-md transition duration-200">Inicio</a>
+                        <a href="#productos" class="text-primary-dark font-medium hover:text-accent-blue px-3 py-2 rounded-md transition duration-200">Productos</a>
+                        <a href="#nosotros" class="text-primary-dark font-medium hover:text-accent-blue px-3 py-2 rounded-md transition duration-200">Nosotros</a>
+                        <a href="#contacto" class="text-primary-dark font-medium hover:text-accent-blue px-3 py-2 rounded-md transition duration-200">Contacto</a>
+                        <a href="#formulario" class="bg-accent-blue text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-opacity-90 transition duration-300 ml-4">Presupuesto Rápido</a>
+                    </div>
+                </nav>
+
+                <!-- Botón Menú Mobile -->
+                <button id="menu-button" type="button" class="md:hidden p-2 rounded-md text-primary-dark hover:text-accent-blue focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent-blue" aria-controls="mobile-menu" aria-expanded="false">
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Menú Mobile (hidden por defecto) -->
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200">
+                <a href="#inicio" class="text-primary-dark block px-3 py-2 rounded-md text-base font-medium hover:bg-bg-light transition">Inicio</a>
+                <a href="#productos" class="text-primary-dark block px-3 py-2 rounded-md text-base font-medium hover:bg-bg-light transition">Productos</a>
+                <a href="#nosotros" class="text-primary-dark block px-3 py-2 rounded-md text-base font-medium hover:bg-bg-light transition">Nosotros</a>
+                <a href="#contacto" class="text-primary-dark block px-3 py-2 rounded-md text-base font-medium hover:bg-bg-light transition">Contacto</a>
+                <a href="#formulario" class="bg-accent-blue text-white block px-3 py-2 rounded-md text-base font-medium text-center mt-2 hover:bg-opacity-90 transition">Presupuesto Rápido</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- SECCIÓN HERO (Inicio) -->
+        <section id="inicio" class="hero-bg h-[60vh] md:h-[80vh] flex items-center justify-center relative">
+            <!-- Capa Oscura para mejor contraste -->
+            <div class="absolute inset-0 bg-primary-dark bg-opacity-70"></div> 
+            
+            <div class="max-w-4xl mx-auto text-center z-10 p-6">
+                <h1 class="text-5xl md:text-7xl font-extrabold text-white leading-tight mb-4 animate-fadeInUp">
+                    DURPLASS: Aberturas de PVC y Puertas de Chapa a Medida
+                </h1>
+                <p class="text-xl md:text-2xl text-gray-200 mb-8 font-light">
+                    Calidad superior y eficiencia energética para tu proyecto. Diseño, fabricación e instalación.
+                </p>
+                <a href="#formulario" class="bg-warm-gold text-primary-dark font-bold text-lg py-3 px-8 rounded-full shadow-2xl hover:bg-opacity-80 transition duration-300 transform hover:scale-105 inline-flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    Pedir Presupuesto Ahora
+                </a>
+            </div>
+        </section>
+
+        <!-- SECCIÓN DE PRODUCTOS -->
+        <section id="productos" class="py-16 md:py-24 bg-bg-light">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl font-extrabold text-primary-dark mb-4">Nuestros Productos de Excelencia</h2>
+                    <p class="text-xl text-gray-600 max-w-2xl mx-auto">Ventanas de PVC, Puertas de Chapa, y soluciones a medida que garantizan aislamiento y durabilidad.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Tarjeta 1: PVC -->
+                    <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition duration-300 p-6 border-t-4 border-accent-blue">
+                        <div class="flex items-center justify-center w-16 h-16 bg-accent-blue bg-opacity-10 rounded-full mb-4">
+                            <!-- Icono de Ventana PVC -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-accent-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7m-7-6v6m0-6v6M4 18h16" /></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-primary-dark mb-2">Aberturas de PVC</h3>
+                        <p class="text-gray-600">Máximo aislamiento térmico y acústico. Cuidado del medio ambiente y ahorro energético garantizado. Diversos sistemas de apertura.</p>
+                    </div>
+
+                    <!-- Tarjeta 2: Chapa -->
+                    <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition duration-300 p-6 border-t-4 border-warm-gold">
+                        <div class="flex items-center justify-center w-16 h-16 bg-warm-gold bg-opacity-10 rounded-full mb-4">
+                            <!-- Icono de Puerta -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-warm-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6-4h12m-6 4v2m0-6V7a2 2 0 012-2h2a2 2 0 012 2v2m-6 4h.01" /></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-primary-dark mb-2">Puertas de Chapa a Medida</h3>
+                        <p class="text-gray-600">Seguridad y robustez para accesos. Fabricadas con materiales de alta resistencia y acabados personalizables.</p>
+                    </div>
+
+                    <!-- Tarjeta 3: Asesoramiento -->
+                    <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition duration-300 p-6 border-t-4 border-primary-dark">
+                        <div class="flex items-center justify-center w-16 h-16 bg-primary-dark bg-opacity-10 rounded-full mb-4">
+                            <!-- Icono de Asesoramiento -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M5 12h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2z" /></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-primary-dark mb-2">Proyectos a la Medida</h3>
+                        <p class="text-gray-600">Servicio integral desde la idea hasta la instalación. Asesoramiento técnico especializado para optimizar tu inversión.</p>
+                    </div>
+                </div>
+                
+                <!-- CTA al Pie de Productos -->
+                <div class="text-center mt-12">
+                    <a href="#formulario" class="bg-accent-blue text-white font-semibold py-3 px-8 rounded-lg shadow-xl hover:bg-opacity-90 transition duration-300 transform hover:scale-105">
+                        Iniciar mi Cotización Personalizada
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN FORMULARIO (Multi-Paso Avanzado) -->
+        <section id="formulario" class="py-16 md:py-24 bg-white">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-10">
+                    <h2 class="text-4xl font-extrabold text-primary-dark mb-4">Presupuesto Rápido - 3 Pasos</h2>
+                    <p class="text-xl text-gray-600">Completa la siguiente información para comenzar a cotizar tu proyecto.</p>
+                </div>
+
+                <!-- Barra de Progreso del Formulario -->
+                <div class="flex justify-between items-center mb-8">
+                    <div class="flex-1 text-center">
+                        <span id="step-1-status" class="w-8 h-8 flex items-center justify-center mx-auto rounded-full bg-accent-blue text-white font-bold transition duration-500">1</span>
+                        <p class="text-sm mt-1 text-primary-dark font-medium">Información Personal</p>
+                    </div>
+                    <div class="w-1/3 h-1 bg-gray-300 transition-all duration-500"></div>
+                    <div class="flex-1 text-center">
+                        <span id="step-2-status" class="w-8 h-8 flex items-center justify-center mx-auto rounded-full bg-gray-300 text-gray-500 font-bold transition duration-500">2</span>
+                        <p class="text-sm mt-1 text-gray-500">Detalles del Proyecto</p>
+                    </div>
+                    <div class="w-1/3 h-1 bg-gray-300 transition-all duration-500"></div>
+                    <div class="flex-1 text-center">
+                        <span id="step-3-status" class="w-8 h-8 flex items-center justify-center mx-auto rounded-full bg-gray-300 text-gray-500 font-bold transition duration-500">3</span>
+                        <p class="text-sm mt-1 text-gray-500">Finalizar</p>
+                    </div>
+                </div>
+
+                <!-- Contenedor del Formulario -->
+                <form id="budget-form" class="bg-bg-light p-6 md:p-10 rounded-xl shadow-2xl">
+                    
+                    <!-- Mensaje de Estado (Errores/Éxito) -->
+                    <div id="form-status" class="hidden p-3 rounded-lg text-white font-semibold mb-4 transition duration-300"></div>
+
+                    <!-- PASO 1: Información Personal -->
+                    <div id="step-1" class="form-step space-y-6">
+                        <h3 class="text-2xl font-bold text-primary-dark border-b pb-2 mb-4">Paso 1: Datos de Contacto</h3>
+                        
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700">Nombre Completo <span class="text-red-500">*</span></label>
+                            <input type="text" id="name" name="name" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm form-input p-3 focus:ring-accent-blue focus:border-accent-blue">
+                        </div>
+
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700">Email <span class="text-red-500">*</span></label>
+                            <input type="email" id="email" name="email" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm form-input p-3 focus:ring-accent-blue focus:border-accent-blue">
+                        </div>
+
+                        <div>
+                            <label for="phone" class="block text-sm font-medium text-gray-700">Teléfono / WhatsApp <span class="text-red-500">*</span></label>
+                            <input type="tel" id="phone" name="phone" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm form-input p-3 focus:ring-accent-blue focus:border-accent-blue">
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button type="button" onclick="nextStep(1)" class="bg-accent-blue text-white font-semibold py-3 px-8 rounded-lg shadow-md hover:bg-opacity-90 transition duration-300">Siguiente Paso</button>
+                        </div>
+                    </div>
+
+                    <!-- PASO 2: Detalles del Proyecto -->
+                    <div id="step-2" class="form-step hidden space-y-6">
+                        <h3 class="text-2xl font-bold text-primary-dark border-b pb-2 mb-4">Paso 2: Especificaciones</h3>
+
+                        <div>
+                            <label for="productType" class="block text-sm font-medium text-gray-700">Tipo de Producto <span class="text-red-500">*</span></label>
+                            <select id="productType" name="productType" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm form-input p-3 focus:ring-accent-blue focus:border-accent-blue bg-white">
+                                <option value="" disabled selected>Seleccione...</option>
+                                <option value="pvc_windows">Ventanas de PVC</option>
+                                <option value="steel_doors">Puertas de Chapa</option>
+                                <option value="custom_project">Proyecto Integral/Otro</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="dimensions" class="block text-sm font-medium text-gray-700">Cantidad y Medidas Aproximadas</label>
+                            <textarea id="dimensions" name="dimensions" rows="4" placeholder="Ej: 3 ventanas (150x120cm), 1 puerta principal (200x90cm)" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm form-input p-3 focus:ring-accent-blue focus:border-accent-blue"></textarea>
+                            <p class="text-xs text-gray-500 mt-1">Sé lo más específico posible para una cotización precisa.</p>
+                        </div>
+                        
+                        <div>
+                            <label for="location" class="block text-sm font-medium text-gray-700">Localidad de la Obra <span class="text-red-500">*</span></label>
+                            <input type="text" id="location" name="location" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm form-input p-3 focus:ring-accent-blue focus:border-accent-blue">
+                        </div>
+
+                        <div class="flex justify-between">
+                            <button type="button" onclick="prevStep(2)" class="text-primary-dark font-semibold py-3 px-6 rounded-lg hover:underline transition duration-300">← Anterior</button>
+                            <button type="button" onclick="nextStep(2)" class="bg-accent-blue text-white font-semibold py-3 px-8 rounded-lg shadow-md hover:bg-opacity-90 transition duration-300">Siguiente Paso</button>
+                        </div>
+                    </div>
+
+                    <!-- PASO 3: Finalizar -->
+                    <div id="step-3" class="form-step hidden space-y-6">
+                        <h3 class="text-2xl font-bold text-primary-dark border-b pb-2 mb-4">Paso 3: Notas Finales y Envío</h3>
+
+                        <div>
+                            <label for="notes" class="block text-sm font-medium text-gray-700">Comentarios Adicionales</label>
+                            <textarea id="notes" name="notes" rows="4" placeholder="Alguna observación sobre la instalación, plazos, o detalles especiales." class="mt-1 block w-full border-gray-300 rounded-md shadow-sm form-input p-3 focus:ring-accent-blue focus:border-accent-blue"></textarea>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <input id="terms" name="terms" type="checkbox" required class="h-4 w-4 text-accent-blue border-gray-300 rounded focus:ring-accent-blue">
+                            <label for="terms" class="ml-2 block text-sm text-gray-900">
+                                Acepto la política de privacidad y que me contacten para el presupuesto. <span class="text-red-500">*</span>
+                            </label>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <button type="button" onclick="prevStep(3)" class="text-primary-dark font-semibold py-3 px-6 rounded-lg hover:underline transition duration-300">← Anterior</button>
+                            <button type="submit" id="submit-button" class="bg-warm-gold text-white font-bold py-3 px-8 rounded-lg shadow-xl hover:bg-opacity-80 transition duration-300 disabled:bg-gray-400">
+                                Enviar Solicitud de Presupuesto
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Área de Redirección a WhatsApp Post-Envío (se muestra con JS) -->
+                <div id="wp-cta-after-form" class="hidden text-center mt-8 p-6 bg-accent-blue bg-opacity-10 border-l-4 border-accent-blue rounded-lg">
+                    <p class="text-xl font-semibold text-primary-dark mb-4">¿Necesitas una respuesta Inmediata?</p>
+                    <a href="https://wa.me/5491100000000?text=Hola,%20acabo%20de%20enviar%20una%20solicitud%20de%20presupuesto%20online." target="_blank" class="bg-green-500 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-green-600 transition duration-300 transform hover:scale-105 inline-flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                        ¡Contactanos por WhatsApp!
+                    </a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- SECCIÓN NOSOTROS/CONTACTO -->
+        <section id="contacto" class="py-16 md:py-24 bg-primary-dark text-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl font-extrabold text-white mb-4">¿Quiénes Somos?</h2>
+                    <p class="text-xl text-gray-300 max-w-3xl mx-auto">DURPLASS S.A.S. es sinónimo de calidad, experiencia y compromiso en el sector de aberturas de alta prestación.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                    <!-- Contacto -->
+                    <div class="bg-white text-primary-dark p-6 rounded-xl shadow-lg">
+                        <div class="flex items-center justify-center w-12 h-12 bg-accent-blue mx-auto rounded-full mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-2 4v7a2 2 0 01-2 2H5a2 2 0 01-2-2v-7" /></svg>
+                        </div>
+                        <h3 class="text-lg font-bold">Email</h3>
+                        <p class="mt-1 text-gray-600">info@durplass.com.ar</p>
+                        <a href="mailto:info@durplass.com.ar" class="text-accent-blue font-medium hover:text-warm-gold transition duration-200">Enviar Correo</a>
+                    </div>
+                    
+                    <!-- Teléfono -->
+                    <div class="bg-white text-primary-dark p-6 rounded-xl shadow-lg">
+                        <div class="flex items-center justify-center w-12 h-12 bg-warm-gold mx-auto rounded-full mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.5l1.643 3.286a1 1 0 01-.219 1.115l-1.396 1.047a7.5 7.5 0 005.696 5.696l1.047-1.396a1 1 0 011.115-.219L19 15.5V19a2 2 0 01-2 2H7a2 2 0 01-2-2v-3.5" /></svg>
+                        </div>
+                        <h3 class="text-lg font-bold">Teléfono/WP</h3>
+                        <p class="mt-1 text-gray-600">+54 9 11 0000-0000</p>
+                        <a href="https://wa.me/5491100000000" target="_blank" class="text-accent-blue font-medium hover:text-warm-gold transition duration-200">Chatear Ahora</a>
+                    </div>
+                    
+                    <!-- Ubicación -->
+                    <div class="bg-white text-primary-dark p-6 rounded-xl shadow-lg">
+                        <div class="flex items-center justify-center w-12 h-12 bg-primary-dark mx-auto rounded-full mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                        </div>
+                        <h3 class="text-lg font-bold">Ubicación</h3>
+                        <p class="mt-1 text-gray-600">Buenos Aires, Argentina (Oficinas y Fábrica)</p>
+                        <!-- Mensaje de Ubicación con un botón que abre el modal -->
+                        <button onclick="showLocationModal()" class="text-accent-blue font-medium hover:text-warm-gold transition duration-200 focus:outline-none">Ver Dirección Aproximada</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Pie de Página -->
+    <footer class="bg-primary-dark border-t border-gray-700">
+        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-gray-400">&copy; 2025 DURPLASS S.A.S. Todos los derechos reservados. Diseño y Fabricación de Aberturas de Alta Performance.</p>
+        </div>
+    </footer>
+    
+    <!-- MODAL DE MENSAJES (Sustituye a alert()) -->
+    <div id="custom-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-[1002] p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 text-center">
+            <h4 id="modal-title" class="text-xl font-bold mb-3 text-primary-dark"></h4>
+            <p id="modal-message" class="text-gray-700 mb-6"></p>
+            <button onclick="document.getElementById('custom-modal').classList.add('hidden')" class="bg-accent-blue text-white py-2 px-6 rounded-lg hover:bg-opacity-90 transition">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        // Lógica de manipulación de UI y Formulario
+        
+        let currentStep = 1;
+        const totalSteps = 3;
+        const form = document.getElementById('budget-form');
         
         /**
-         * Inicializa Firebase, autentica al usuario y establece el ID de usuario.
+         * Muestra un mensaje en el modal personalizado.
          */
-        async function initializeFirebase() {
-            try {
-                if (Object.keys(firebaseConfig).length === 0) {
-                    console.warn("Firebase config is empty. Firestore will not be functional.");
-                    return;
-                }
-                
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
-
-                userId = auth.currentUser ? auth.currentUser.uid : crypto.randomUUID();
-                console.log("Firebase initialized. User ID:", userId);
-
-            } catch (error) {
-                console.error("Error al inicializar Firebase o autenticar:", error);
-                showMessage(`Error de conexión: ${error.message}`, 'bg-red-500');
-            }
+        function showCustomModal(title, message) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = message;
+            document.getElementById('custom-modal').classList.remove('hidden');
         }
 
         /**
-         * Muestra un mensaje de estado al usuario.
-         * @param {string} message - El mensaje a mostrar.
-         * @param {string} className - Clase de Tailwind para el color (e.g., 'bg-green-500').
+         * Muestra un mensaje de estado en el formulario.
          */
         function showMessage(message, className) {
             const statusMessage = document.getElementById('form-status');
+            
             if (!statusMessage) {
-                console.error("DOM element 'form-status' not found. Skipping message display.");
+                console.error("DOM element 'form-status' not found.");
                 return;
             }
 
@@ -101,512 +580,255 @@
             statusMessage.classList.add(className);
             statusMessage.textContent = message;
             
+            // Ocultar después de 5 segundos
             setTimeout(() => {
                 statusMessage.classList.add('hidden');
-            }, 6000);
+            }, 5000);
         }
 
         /**
-         * Maneja el cambio del selector de material y actualiza las opciones de color.
+         * Lógica de navegación del formulario multi-paso.
          */
-        window.updateColorOptions = function() {
-            const materialSelect = document.getElementById('material');
-            const colorSelect = document.getElementById('color-perfil');
-            const selectedMaterial = materialSelect.value;
+        function updateStepUI() {
+            // Ocultar todos los pasos
+            document.querySelectorAll('.form-step').forEach(step => step.classList.add('hidden'));
+            // Mostrar el paso actual
+            document.getElementById(`step-${currentStep}`).classList.remove('hidden');
 
-            // Limpiar opciones anteriores
-            colorSelect.innerHTML = ''; 
-
-            if (selectedMaterial === 'pvc') {
-                // Opciones para PVC (Blanco, Negro, Símil Madera)
-                const pvcColors = [
-                    { value: 'blanco', text: 'Blanco (Estándar)' },
-                    { value: 'negro', text: 'Negro' },
-                    { value: 'similmadera', text: 'Símil Madera' },
-                    { value: 'otros', text: 'Otros (Especificar en detalles)' }
-                ];
-                pvcColors.forEach(color => {
-                    colorSelect.options.add(new Option(color.text, color.value));
-                });
-            } else if (selectedMaterial === 'aluminio') {
-                // Opciones para Aluminio (Blanco, Negro/Anodizado)
-                const aluminioColors = [
-                    { value: 'blanco', text: 'Blanco' },
-                    { value: 'negro', text: 'Negro' },
-                    { value: 'anodizadonatural', text: 'Anodizado Natural' },
-                    { value: 'otros', text: 'Otros (Especificar en detalles)' }
-                ];
-                aluminioColors.forEach(color => {
-                    colorSelect.options.add(new Option(color.text, color.value));
-                });
-            } else {
-                // Opción por defecto
-                 colorSelect.options.add(new Option('Seleccione primero el Material...', '', true, true));
+            // Actualizar la barra de progreso
+            for (let i = 1; i <= totalSteps; i++) {
+                const status = document.getElementById(`step-${i}-status`);
+                const text = status.nextElementSibling;
+                if (i < currentStep) {
+                    status.classList.remove('bg-gray-300', 'text-gray-500');
+                    status.classList.add('bg-warm-gold', 'text-white');
+                    text.classList.remove('text-gray-500');
+                    text.classList.add('text-primary-dark', 'font-bold');
+                } else if (i === currentStep) {
+                    status.classList.remove('bg-gray-300', 'bg-warm-gold', 'text-gray-500');
+                    status.classList.add('bg-accent-blue', 'text-white');
+                    text.classList.remove('text-gray-500', 'font-bold');
+                    text.classList.add('text-primary-dark', 'font-medium');
+                } else {
+                    status.classList.remove('bg-accent-blue', 'bg-warm-gold', 'text-white');
+                    status.classList.add('bg-gray-300', 'text-gray-500');
+                    text.classList.remove('text-primary-dark', 'font-bold', 'font-medium');
+                    text.classList.add('text-gray-500');
+                }
             }
         }
 
         /**
-         * Maneja el envío del formulario y guarda la solicitud en Firestore.
+         * Valida los campos del paso actual.
+         * @param {number} step - El número del paso a validar.
+         * @returns {boolean} - true si es válido, false si hay errores.
          */
-        window.saveBudgetRequest = async function(event) {
-            event.preventDefault();
-            
-            if (!db) {
-                showMessage('Error: La base de datos no está inicializada. Intente recargar.', 'bg-red-500');
-                return;
-            }
+        function validateStep(step) {
+            const currentStepElement = document.getElementById(`step-${step}`);
+            let isValid = true;
+            let firstInvalid = null;
 
-            const form = document.getElementById('budget-form');
-            if (!form.checkValidity()) {
-                showMessage('Por favor, complete todos los campos obligatorios correctamente.', 'bg-yellow-500');
-                form.reportValidity(); // Muestra mensajes de error del navegador
-                return;
+            currentStepElement.querySelectorAll('input[required], select[required], textarea[required]').forEach(input => {
+                input.classList.remove('border-red-500');
+                if (!input.value.trim() || (input.type === 'checkbox' && !input.checked)) {
+                    input.classList.add('border-red-500');
+                    isValid = false;
+                    if (!firstInvalid) firstInvalid = input;
+                }
+            });
+
+            if (!isValid) {
+                showMessage("Por favor, complete todos los campos obligatorios (*).", 'bg-red-500');
+                if (firstInvalid) firstInvalid.focus();
             }
+            return isValid;
+        }
+
+        /**
+         * Mueve al siguiente paso del formulario.
+         * @param {number} step - El paso actual.
+         */
+        function nextStep(step) {
+            if (validateStep(step)) {
+                if (currentStep < totalSteps) {
+                    currentStep++;
+                    updateStepUI();
+                    // Opcional: scroll al inicio del formulario
+                    document.getElementById('formulario').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+        }
+
+        /**
+         * Mueve al paso anterior del formulario.
+         * @param {number} step - El paso actual.
+         */
+        function prevStep(step) {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStepUI();
+                document.getElementById('formulario').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        /**
+         * Maneja el envío del formulario.
+         */
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            if (!validateStep(totalSteps)) return;
+
+            const submitButton = document.getElementById('submit-button');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Enviando...';
+            showMessage("Procesando solicitud...", 'bg-yellow-500');
 
             const formData = new FormData(form);
             const data = {};
-            formData.forEach((value, key) => data[key] = value);
+            formData.forEach((value, key) => { data[key] = value; });
 
-            // Preparar el documento para Firestore
-            const requestData = {
-                timestamp: serverTimestamp(),
-                userId: userId,
-                status: 'Pendiente',
-                // Datos del formulario
-                nombre: data.nombre,
-                email: data.email,
-                telefono: data.telefono,
-                localidad: data.localidad,
-                tipoCliente: data['tipo-cliente'],
-                tipoObra: data['tipo-obra'],
-                
-                // Nuevos campos de especificación
-                material: data.material,
-                productoPrincipal: data['producto-principal'],
-                cantidadEstimada: parseInt(data['cantidad-estimada'], 10) || 0,
-                colorPerfil: data['color-perfil'],
-                tipoVidrio: data['tipo-vidrio'],
-                medidasEstimadas: data['medidas-estimadas'],
-                detallesAdicionales: data['detalles-adicionales'],
-            };
-
-            try {
-                // Ruta para datos privados del usuario: /artifacts/{appId}/users/{userId}/budget_requests
-                const userRef = doc(db, 'artifacts', appId, 'users', userId);
-                const collectionRef = collection(userRef, 'budget_requests');
-                
-                await addDoc(collectionRef, requestData);
-
-                showMessage('¡Solicitud de presupuesto enviada con éxito! Nos pondremos en contacto pronto.', 'bg-green-500');
-                form.reset(); // Limpia el formulario
-                window.updateColorOptions(); // Restablece la lista de colores
-            } catch (error) {
-                console.error("Error al guardar la solicitud en Firestore: ", error);
-                // FIX: El mensaje de error era el problema, ahora debería ser más informativo
-                showMessage(`Error al enviar la solicitud (Ver consola): ${error.message}`, 'bg-red-500');
+            // Llamar a la función global de guardado (definida en el script module)
+            const success = await window.saveBudgetRequest(data);
+            
+            if (success) {
+                form.reset();
+                currentStep = 1;
+                updateStepUI();
+                document.getElementById('wp-cta-after-form').classList.remove('hidden');
+                document.getElementById('budget-form').classList.add('hidden');
             }
+            
+            submitButton.disabled = false;
+            submitButton.textContent = 'Enviar Solicitud de Presupuesto';
+        });
+
+        /**
+         * Maneja la apertura del modal de ubicación.
+         */
+        function showLocationModal() {
+            showCustomModal(
+                "Ubicación DURPLASS S.A.S.", 
+                "Nuestras oficinas y fábrica se encuentran en Buenos Aires, Argentina. La dirección exacta se proporciona al avanzar con el presupuesto o concretar una visita, para garantizar la seguridad y atención personalizada."
+            );
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            // Inicializar la aplicación
-            initializeFirebase();
-            window.navigateTo('inicio-page'); // Mostrar la página de inicio por defecto
-            window.updateColorOptions(); // Inicializar las opciones de color
+        // --- Lógica del Chatbot/Asistente ---
+        
+        const chatbotModal = document.getElementById('chatbot-modal');
+        const chatbotBody = document.getElementById('chatbot-body');
+        
+        document.getElementById('chatbot-button').addEventListener('click', () => {
+            chatbotModal.classList.remove('hidden');
+            // Asegurar que el modal esté visible y centrado.
+            setTimeout(() => {
+                chatbotModal.style.opacity = '1';
+                // Resetear el cuerpo del chat a su estado inicial si es necesario
+                if (chatbotBody.children.length > 1) {
+                    // Si ya hay más de un mensaje, reiniciamos el estado
+                    chatbotBody.innerHTML = `
+                        <div class="flex justify-start">
+                            <div class="bg-gray-200 p-3 rounded-xl max-w-[80%] shadow-md">
+                                <p class="text-sm">¡Hola! Soy tu asistente de DURPLASS. Puedo ayudarte con:</p>
+                                <div class="mt-2 space-y-2">
+                                    <button onclick="handleChatbotAction('presupuesto')" class="w-full text-left bg-accent-blue text-white text-xs px-2 py-1 rounded hover:bg-opacity-80 transition">1. Solicitar Presupuesto</button>
+                                    <button onclick="handleChatbotAction('productos')" class="w-full text-left bg-accent-blue text-white text-xs px-2 py-1 rounded hover:bg-opacity-80 transition">2. Ver Productos</button>
+                                    <button onclick="handleChatbotAction('whatsapp')" class="w-full text-left bg-accent-blue text-white text-xs px-2 py-1 rounded hover:bg-opacity-80 transition">3. Contacto Directo WP</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }, 50);
+        });
 
-            // Toggle mobile menu visibility
-            const menuButton = document.getElementById('menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
+        function closeChatbotModal() {
+            chatbotModal.classList.add('hidden');
+        }
 
-            if(menuButton && mobileMenu) {
-                menuButton.addEventListener('click', function() {
-                    mobileMenu.classList.toggle('hidden');
-                });
+        function appendUserMessage(message) {
+            const userMsg = document.createElement('div');
+            userMsg.className = 'flex justify-end';
+            userMsg.innerHTML = `<div class="bg-accent-blue text-white p-3 rounded-xl max-w-[80%] shadow-md"><p class="text-sm">${message}</p></div>`;
+            chatbotBody.appendChild(userMsg);
+            chatbotBody.scrollTop = chatbotBody.scrollHeight;
+        }
+
+        function appendBotMessage(messageHtml) {
+            const botMsg = document.createElement('div');
+            botMsg.className = 'flex justify-start';
+            botMsg.innerHTML = `<div class="bg-gray-200 p-3 rounded-xl max-w-[80%] shadow-md">${messageHtml}</div>`;
+            chatbotBody.appendChild(botMsg);
+            chatbotBody.scrollTop = chatbotBody.scrollHeight;
+        }
+
+        function handleChatbotAction(action) {
+            let userText = '';
+            let botResponse = '';
+
+            switch(action) {
+                case 'presupuesto':
+                    userText = 'Quiero solicitar un presupuesto.';
+                    botResponse = `
+                        <p class="text-sm">¡Perfecto! Te guiaré. Haz click en <a href="#formulario" onclick="closeChatbotModal()" class="text-accent-blue font-bold hover:underline">este enlace</a> o cierra el chat y dirígete a la sección "Presupuesto Rápido" para comenzar el proceso multi-paso.</p>
+                        <div class="mt-2 space-y-2">
+                            <button onclick="handleChatbotAction('productos')" class="w-full text-left bg-accent-blue text-white text-xs px-2 py-1 rounded hover:bg-opacity-80 transition">Ver Productos</button>
+                        </div>
+                    `;
+                    break;
+                case 'productos':
+                    userText = 'Quiero ver sus productos.';
+                    botResponse = `
+                        <p class="text-sm">Nuestros productos principales son las **Aberturas de PVC** y las **Puertas de Chapa a Medida**. Puedes ver más detalles en <a href="#productos" onclick="closeChatbotModal()" class="text-accent-blue font-bold hover:underline">la sección de Productos</a>.</p>
+                        <div class="mt-2 space-y-2">
+                            <button onclick="handleChatbotAction('presupuesto')" class="w-full text-left bg-accent-blue text-white text-xs px-2 py-1 rounded hover:bg-opacity-80 transition">Pedir Presupuesto</button>
+                        </div>
+                    `;
+                    break;
+                case 'whatsapp':
+                    userText = 'Necesito contacto directo por WhatsApp.';
+                    botResponse = `
+                        <p class="text-sm">Entiendo. Puedes iniciar un chat directo con nuestro equipo de ventas haciendo click en el **icono verde de WhatsApp flotante** en la esquina inferior derecha. ¡Estarán encantados de ayudarte!</p>
+                        <div class="mt-2 space-y-2">
+                            <a href="https://wa.me/5491100000000" target="_blank" class="w-full text-left bg-green-500 text-white text-xs px-2 py-1 rounded hover:bg-green-600 transition inline-block text-center">Abrir WhatsApp</a>
+                        </div>
+                    `;
+                    break;
+                default:
+                    userText = 'Opción no reconocida.';
+                    botResponse = '<p class="text-sm">Disculpa, no entendí esa opción. Por favor, selecciona una de las guías disponibles:</p>';
             }
 
-            // Manejo de navegación en menú móvil y desktop
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.addEventListener('click', (e) => {
-                    const pageId = e.currentTarget.dataset.page;
-                    window.navigateTo(pageId);
-                    if(mobileMenu) mobileMenu.classList.add('hidden'); // Ocultar después de navegar en móvil
-                });
+            appendUserMessage(userText);
+            appendBotMessage(botResponse);
+        }
+
+        // --- Inicialización ---
+
+        // Toggle mobile menu visibility
+        document.getElementById('menu-button').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            if(mobileMenu) mobileMenu.classList.toggle('hidden');
+        });
+
+        // Hide mobile menu when a link is clicked
+        document.querySelectorAll('#mobile-menu a').forEach(item => {
+            item.addEventListener('click', () => {
+                const mobileMenu = document.getElementById('mobile-menu');
+                if(mobileMenu) mobileMenu.classList.add('hidden');
             });
         });
+
+        // Mostrar el primer paso del formulario al cargar
+        window.addEventListener('DOMContentLoaded', () => {
+            updateStepUI();
+            // Mostrar la sección del formulario si hay un hash
+            if (window.location.hash === '#formulario') {
+                 document.getElementById('formulario').scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+
+        // Inicialización de Firebase (Definida en el script module)
+        window.onload = window.initializeFirebase;
     </script>
-    
-    <style>
-        /* Paleta de Colores DURPLASS inspirada en el logo (Marrón, Azul, Dorado) */
-        :root {
-            --color-primary-dark: #3A2A1A; /* Marrón Oscuro - Base del logo */
-            --color-accent-blue: #0C7AFE; /* Azul Brillante - Ventanas/Acento, más llamativo */
-            --color-warm-gold: #A07A48; /* Dorado - Acento Cálido */
-            --color-bg-light: #F8F8F8; /* Fondo de Secciones */
-            --color-text-main: #222;
-            --color-white: #ffffff;
-            font-family: 'Inter', sans-serif;
-        }
-
-        /* Estilos generales, scroll suave y corrección de espaciado de líneas */
-        html { scroll-behavior: smooth; }
-        body { color: var(--color-text-main); }
-
-        /* Estilo para los botones principales (Moderno y con Sombra) */
-        .btn-primary {
-            background-color: var(--color-accent-blue);
-            color: var(--color-white);
-            transition: all 0.3s ease;
-            box-shadow: 0 6px 15px -3px rgba(12, 122, 254, 0.4); /* Sombra azul más marcada */
-        }
-        .btn-primary:hover {
-            background-color: #0060e2; /* Un tono más oscuro */
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px -5px rgba(12, 122, 254, 0.6);
-        }
-        
-        /* Estilo para la portada (Hero Section) */
-        .hero-section {
-            /* Usando una imagen simulada más impactante con color de marca */
-            background-image: url('https://placehold.co/1920x800/0C7AFE/ffffff?text=DURPLASS+PVC+%26+ALUMINIO+PREMIUM');
-            background-size: cover;
-            background-position: center;
-            position: relative;
-        }
-        .hero-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.4); /* Oscurecer ligeramente para que el texto resalte */
-            z-index: 1;
-        }
-        .hero-section > * { z-index: 2; position: relative; }
-        
-        /* Estilos específicos para el formulario */
-        .form-group > label {
-            font-weight: 600;
-            color: var(--color-primary-dark);
-            margin-bottom: 0.25rem;
-            display: block;
-        }
-        .form-group select, 
-        .form-group input:not([type='radio']):not([type='checkbox']), 
-        .form-group textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
-            transition: all 0.2s;
-        }
-        .form-group input:focus, 
-        .form-group select:focus, 
-        .form-group textarea:focus {
-            border-color: var(--color-accent-blue);
-            box-shadow: 0 0 0 2px rgba(12, 122, 254, 0.2);
-            outline: none;
-        }
-
-    </style>
-</head>
-<body class="bg-white">
-
-    <!-- Navbar/Header Fijo (Responsive) -->
-    <header class="sticky top-0 z-50 bg-white shadow-lg">
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <!-- Logo de la Empresa -->
-                <a href="#" onclick="navigateTo('inicio-page')" class="text-2xl font-extrabold text-[var(--color-primary-dark)] tracking-wider">
-                    DURPLASS <span class="text-lg font-light text-[var(--color-accent-blue)]">S.A.S.</span>
-                </a>
-                
-                <!-- Menú Desktop -->
-                <div class="hidden md:flex space-x-8">
-                    <a href="#" data-page="inicio-page" class="nav-link text-gray-600 hover:text-[var(--color-accent-blue)] font-medium transition duration-150 ease-in-out text-[var(--color-accent-blue)]">Inicio</a>
-                    <a href="#" data-page="presupuesto-page" class="nav-link text-gray-600 hover:text-[var(--color-accent-blue)] font-medium transition duration-150 ease-in-out">Presupuesto</a>
-                    <a href="#contacto-section" class="text-gray-600 hover:text-[var(--color-accent-blue)] font-medium transition duration-150 ease-in-out">Contacto</a>
-                </div>
-
-                <!-- Botón de Menú para Móviles -->
-                <button id="menu-button" type="button" class="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--color-accent-blue)]" aria-controls="mobile-menu" aria-expanded="false">
-                    <icon name="Menu" size="24" class="block h-6 w-6"></icon>
-                </button>
-            </div>
-        </nav>
-
-        <!-- Menú Móvil (Oculto por defecto) -->
-        <div class="hidden md:hidden" id="mobile-menu">
-            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 flex flex-col">
-                <a href="#" data-page="inicio-page" class="nav-link text-gray-600 hover:bg-gray-50 hover:text-[var(--color-accent-blue)] px-3 py-2 rounded-md text-base font-medium text-[var(--color-accent-blue)]">Inicio</a>
-                <a href="#" data-page="presupuesto-page" class="nav-link text-gray-600 hover:bg-gray-50 hover:text-[var(--color-accent-blue)] px-3 py-2 rounded-md text-base font-medium">Presupuesto</a>
-                <a href="#contacto-section" class="text-gray-600 hover:bg-gray-50 hover:text-[var(--color-accent-blue)] px-3 py-2 rounded-md text-base font-medium">Contacto</a>
-            </div>
-        </div>
-    </header>
-
-    <main>
-        <!-- VISTA 1: PÁGINA PRINCIPAL (INICIO + SERVICIOS + CONTACTO - Todo en una sola vista) -->
-        <section id="inicio-page" class="transition-all duration-500">
-            <!-- Sección 1: Portada Brillante (Hero Section) -->
-            <div class="hero-section h-[70vh] flex items-center justify-center text-center">
-                <div class="text-white p-6 sm:p-12 rounded-xl backdrop-blur-sm bg-black/40 shadow-2xl">
-                    <p class="text-lg font-light mb-3 tracking-widest uppercase">Tecnología y Aislamiento</p>
-                    <h1 class="text-5xl sm:text-7xl font-extrabold mb-5 drop-shadow-xl leading-tight">
-                        DURPLASS: Aberturas de Excelencia
-                    </h1>
-                    <p class="text-xl sm:text-2xl font-light mb-10 drop-shadow-lg max-w-4xl mx-auto">
-                        Fabricamos la solución perfecta en PVC y Aluminio para la Patagonia y todo Argentina, desde nuestra fábrica en Buenos Aires.
-                    </p>
-                    <a href="#" onclick="navigateTo('presupuesto-page')" class="inline-block px-10 py-4 rounded-xl text-lg font-semibold btn-primary uppercase tracking-wider">
-                        <icon name="DollarSign" size="20" class="inline mr-2"></icon>
-                        Cotizar Ahora
-                    </a>
-                </div>
-            </div>
-
-            <!-- Sección 2: Servicios/Productos Destacados -->
-            <div id="servicios-section" class="py-16 sm:py-24 bg-white">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div class="text-center mb-16">
-                        <h2 class="text-4xl font-extrabold text-[var(--color-primary-dark)] mb-4">Nuestras Soluciones</h2>
-                        <p class="text-xl text-gray-600 max-w-3xl mx-auto">Calidad, diseño y la resistencia que su proyecto requiere.</p>
-                    </div>
-                    
-                    <div class="grid md:grid-cols-3 gap-10">
-                        <!-- Tarjeta 1: Aberturas de PVC -->
-                        <div class="bg-[var(--color-bg-light)] p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 transform hover:scale-[1.02] border-t-4 border-[var(--color-accent-blue)]">
-                            <icon name="Layers3" size="36" class="text-[var(--color-accent-blue)] mb-4"></icon>
-                            <h3 class="text-2xl font-semibold mb-3 text-[var(--color-primary-dark)]">Aberturas de PVC</h3>
-                            <p class="text-gray-600">Líderes en aislamiento térmico y acústico. Ideales para el clima extremo de la Patagonia, garantizando eficiencia energética.</p>
-                        </div>
-
-                        <!-- Tarjeta 2: Aberturas de Aluminio -->
-                        <div class="bg-[var(--color-bg-light)] p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 transform hover:scale-[1.02] border-t-4 border-[var(--color-primary-dark)]">
-                            <icon name="Home" size="36" class="text-[var(--color-primary-dark)] mb-4"></icon>
-                            <h3 class="text-2xl font-semibold mb-3 text-[var(--color-primary-dark)]">Aberturas de Aluminio</h3>
-                            <p class="text-gray-600">Perfiles robustos, diseño moderno y gran resistencia estructural. Amplia variedad de acabados y líneas.</p>
-                        </div>
-
-                        <!-- Tarjeta 3: Logística y Asesoramiento -->
-                        <div class="bg-[var(--color-bg-light)] p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 transform hover:scale-[1.02] border-t-4 border-[var(--color-warm-gold)]">
-                             <icon name="Factory" size="36" class="text-[var(--color-warm-gold)] mb-4"></icon>
-                            <h3 class="text-2xl font-semibold mb-3 text-[var(--color-primary-dark)]">Logística Nacional</h3>
-                            <p class="text-gray-600">Fabricación centralizada en Tristán Suárez (BA) y distribución eficiente, con foco en el servicio a la Patagonia (Ushuaia).</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sección 3: Contacto (Información de Ubicaciones) -->
-            <div id="contacto-section" class="py-16 sm:py-24 bg-[var(--color-bg-light)]">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div class="text-center mb-12">
-                        <h2 class="text-4xl font-extrabold text-[var(--color-primary-dark)] mb-4">Contáctenos</h2>
-                        <p class="text-xl text-gray-600">Dos puntos estratégicos para un servicio integral.</p>
-                    </div>
-
-                    <div class="grid md:grid-cols-2 gap-10">
-                        <!-- Contacto 1: Oficina de Ventas (Ushuaia) -->
-                        <div class="bg-white p-8 rounded-xl shadow-xl border-b-4 border-[var(--color-accent-blue)]">
-                            <icon name="MapPin" size="36" class="text-[var(--color-accent-blue)] mb-4"></icon>
-                            <h3 class="text-2xl font-semibold mb-3 text-[var(--color-primary-dark)]">Oficina Central de Ventas</h3>
-                            <p class="text-xl font-bold mb-4 text-[var(--color-accent-blue)]">Ushuaia, Tierra del Fuego</p>
-                            
-                            <ul class="space-y-3 text-gray-700">
-                                <li>
-                                    <icon name="MapPin" size="18" class="inline mr-2 text-gray-500"></icon>
-                                    Av. San Martín 1500 (Dirección Mock)
-                                </li>
-                                <li>
-                                    <icon name="Phone" size="18" class="inline mr-2 text-gray-500"></icon>
-                                    **Teléfono Ventas:** (02901) 42-XXXX (Placeholder)
-                                </li>
-                                <li>
-                                    <icon name="Mail" size="18" class="inline mr-2 text-gray-500"></icon>
-                                    **Email Ventas:** <a href="mailto:ventas@durplass.com.ar" class="text-[var(--color-accent-blue)] hover:underline">ventas@durplass.com.ar</a>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <!-- Contacto 2: Fábrica de Producción (Tristán Suárez) -->
-                        <div class="bg-white p-8 rounded-xl shadow-xl border-b-4 border-[var(--color-primary-dark)]">
-                            <icon name="Factory" size="36" class="text-[var(--color-primary-dark)] mb-4"></icon>
-                            <h3 class="text-2xl font-semibold mb-3 text-[var(--color-primary-dark)]">Fábrica y Logística</h3>
-                            <p class="text-xl font-bold mb-4 text-[var(--color-primary-dark)]">Tristán Suárez, Buenos Aires</p>
-                            
-                            <ul class="space-y-3 text-gray-700">
-                                <li>
-                                    <icon name="MapPin" size="18" class="inline mr-2 text-gray-500"></icon>
-                                    Ruta 205 Km 42 (Dirección Mock)
-                                </li>
-                                <li>
-                                    <icon name="Phone" size="18" class="inline mr-2 text-gray-500"></icon>
-                                    **Teléfono Fábrica:** (011) 43-XXXX (Placeholder)
-                                </li>
-                                <li>
-                                    <icon name="Mail" size="18" class="inline mr-2 text-gray-500"></icon>
-                                    **Email General:** <a href="mailto:info@durplass.com.ar" class="text-[var(--color-accent-blue)] hover:underline">info@durplass.com.ar</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-
-        <!-- VISTA 2: PÁGINA DE PRESUPUESTO (Oculta por defecto) -->
-        <section id="presupuesto-page" class="py-16 sm:py-24 bg-[var(--color-bg-light)] hidden transition-all duration-500">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-12">
-                    <h2 class="text-4xl font-extrabold text-[var(--color-primary-dark)] mb-4">Solicitud de Presupuesto Detallado</h2>
-                    <p class="text-xl text-gray-600">Seleccione el material, configure su producto y reciba su cotización sin compromiso.</p>
-                </div>
-
-                <!-- Mensaje de Estado (Para errores de validación o éxito) -->
-                <div id="form-status" class="hidden p-4 mb-6 text-white font-semibold rounded-lg shadow-md text-center" role="alert">
-                    Mensaje de estado.
-                </div>
-
-                <div class="bg-white p-6 sm:p-10 rounded-2xl shadow-xl border border-gray-100">
-                    <form id="budget-form" onsubmit="saveBudgetRequest(event)" class="space-y-8">
-                        
-                        <!-- Grupo 1: Datos de Contacto y Perfil -->
-                        <fieldset class="border border-gray-200 p-6 rounded-lg space-y-6">
-                            <legend class="text-xl font-bold text-[var(--color-accent-blue)] px-2">1. Información Personal y de Obra</legend>
-                            
-                            <!-- Tipo de Cliente y Obra -->
-                            <div class="grid md:grid-cols-2 gap-6">
-                                <div class="form-group">
-                                    <label for="tipo-cliente">Tipo de Cliente <span class="text-red-500">*</span></label>
-                                    <select id="tipo-cliente" name="tipo-cliente" required>
-                                        <option value="">Seleccione...</option>
-                                        <option value="particular">Particular</option>
-                                        <option value="empresa">Empresa / Constructor</option>
-                                        <option value="arquitecto">Arquitecto / Estudio</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="tipo-obra">Tipo de Obra <span class="text-red-500">*</span></label>
-                                    <select id="tipo-obra" name="tipo-obra" required>
-                                        <option value="">Seleccione...</option>
-                                        <option value="nueva">Obra Nueva</option>
-                                        <option value="remodelacion">Remodelación/Reemplazo</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <!-- Datos de Contacto -->
-                            <div class="grid md:grid-cols-2 gap-6">
-                                <div class="form-group">
-                                    <label for="nombre">Nombre y Apellido / Razón Social <span class="text-red-500">*</span></label>
-                                    <input type="text" id="nombre" name="nombre" placeholder="Juan Pérez / Constructora ABC" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="email">Email <span class="text-red-500">*</span></label>
-                                    <input type="email" id="email" name="email" placeholder="contacto@ejemplo.com" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="telefono">Teléfono (con código de área) <span class="text-red-500">*</span></label>
-                                    <input type="tel" id="telefono" name="telefono" placeholder="Ej: 011 15 4444 5555" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="localidad">Localidad de la Obra <span class="text-red-500">*</span></label>
-                                    <input type="text" id="localidad" name="localidad" placeholder="Tristán Suárez, Ushuaia, etc." required>
-                                </div>
-                            </div>
-                        </fieldset>
-
-                        <!-- Grupo 2: Especificaciones del Producto (LÓGICA CRÍTICA) -->
-                        <fieldset class="border border-gray-200 p-6 rounded-lg space-y-6">
-                            <legend class="text-xl font-bold text-[var(--color-accent-blue)] px-2">2. Especificaciones de Aberturas</legend>
-                            
-                            <div class="grid md:grid-cols-3 gap-6">
-                                <!-- Campo de Material (PVC o ALUMINIO) -->
-                                <div class="form-group">
-                                    <label for="material">Material Principal <span class="text-red-500">*</span></label>
-                                    <select id="material" name="material" onchange="updateColorOptions()" required>
-                                        <option value="">Seleccione Material...</option>
-                                        <option value="pvc">PVC</option>
-                                        <option value="aluminio">ALUMINIO</option>
-                                        <option value="puertachapa">PUERTA DE CHAPA (a medida)</option>
-                                    </select>
-                                </div>
-                                
-                                <!-- Opciones de Producto -->
-                                <div class="form-group">
-                                    <label for="producto-principal">Tipo de Producto <span class="text-red-500">*</span></label>
-                                    <select id="producto-principal" name="producto-principal" required>
-                                        <option value="">Seleccione Producto...</option>
-                                        <option value="corrediza">Corrediza</option>
-                                        <option value="oscilobatiente">Oscilo-Batiente</option>
-                                        <option value="fija">Fija / Paño Fijo</option>
-                                        <option value="puerta">Puerta Balcón / de Acceso</option>
-                                        <option value="otros">Otros</option>
-                                    </select>
-                                </div>
-                                
-                                <!-- Opciones de Color (Cambian con la función JS) -->
-                                <div class="form-group">
-                                    <label for="color-perfil">Color de Perfil <span class="text-red-500">*</span></label>
-                                    <select id="color-perfil" name="color-perfil" required>
-                                        <option value="">Seleccione primero el Material...</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="tipo-vidrio">Tipo de Vidrio</label>
-                                    <select id="tipo-vidrio" name="tipo-vidrio">
-                                        <option value="simple">Simple</option>
-                                        <option value="dvh494">Doble Vidrio Hermético (DVH 4/9/4)</option>
-                                        <option value="dvhotros">DVH (Otras configuraciones)</option>
-                                        <option value="laminado">Laminado de Seguridad</option>
-                                        <option value="triplice">Triple Vidriado Hermético (TVH)</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="cantidad-estimada">Cantidad Estimada</label>
-                                    <input type="number" id="cantidad-estimada" name="cantidad-estimada" min="1" placeholder="Ej: 5">
-                                </div>
-
-                                <div class="form-group md:col-span-1">
-                                    <label for="medidas-estimadas">Medidas Principales (Ancho x Alto)</label>
-                                    <input type="text" id="medidas-estimadas" name="medidas-estimadas" placeholder="Ej: 1500mm x 1200mm, o listar principales">
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="detalles-adicionales">Detalles Adicionales y Requerimientos Especiales</label>
-                                <textarea id="detalles-adicionales" name="detalles-adicionales" rows="4" placeholder="Indique el total de aberturas, persianas, mosquiteros u otros detalles que ayuden a la cotización..."></textarea>
-                            </div>
-                        </fieldset>
-
-                        <div class="text-center pt-4">
-                            <button type="submit" class="w-full md:w-auto px-10 py-4 rounded-xl text-xl font-bold btn-primary uppercase tracking-wide">
-                                <icon name="DollarSign" size="20" class="inline mr-2"></icon>
-                                Enviar Solicitud de Presupuesto
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Footer (Fuera de las secciones de página para que aparezca en ambas vistas) -->
-    <footer class="bg-[var(--color-primary-dark)] text-white py-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <p class="text-lg font-bold mb-2">DURPLASS S.A.S. | Aberturas y Soluciones Constructivas</p>
-            <div class="flex flex-col sm:flex-row justify-center space-y-2 sm:space-y-0 sm:space-x-8 text-sm text-gray-300 mb-4">
-                <a href="#" onclick="navigateTo('inicio-page')" class="nav-link hover:text-[var(--color-warm-gold)]">Inicio</a>
-                <a href="#" onclick="navigateTo('presupuesto-page')" class="nav-link hover:text-[var(--color-warm-gold)]">Presupuesto</a>
-                <a href="#contacto-section" class="hover:text-[var(--color-warm-gold)]">Contacto</a>
-            </div>
-             <p class="text-xs text-gray-400">© 2025 DURPLASS S.A.S. Todos los derechos reservados. | Fábrica en Tristán Suárez, BA. | Ventas en Ushuaia, TDF. | ID de Sesión: ${userId}</p>
-        </div>
-    </footer>
-
 </body>
 </html>
