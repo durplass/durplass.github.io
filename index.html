@@ -20,226 +20,347 @@
             font-family: 'Inter', sans-serif;
         }
 
-        /* Estilos generales, scroll suave y corrección de espaciado de líneas */
+        /* Estilos generales y scroll suave */
         html { scroll-behavior: smooth; }
-        body { color: var(--color-text-main); background-color: var(--color-white); line-height: 1.6; }
+        body { color: var(--color-text-main); }
+
+        /* Estilo primario para botones */
+        .btn-primary {
+            background-color: var(--color-accent-blue);
+            color: var(--color-white);
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+        .btn-primary:hover {
+            background-color: #3C7DCF;
+            transform: translateY(-1px);
+        }
+        .btn-primary:active {
+            transform: translateY(1px);
+        }
+
+        /* Utilidades de color */
         .text-primary-dark { color: var(--color-primary-dark); }
         .bg-primary-dark { background-color: var(--color-primary-dark); }
         .text-accent-blue { color: var(--color-accent-blue); }
         .bg-accent-blue { background-color: var(--color-accent-blue); }
-        .bg-warm-gold { background-color: var(--color-warm-gold); }
         .text-warm-gold { color: var(--color-warm-gold); }
+        .bg-warm-gold { background-color: var(--color-warm-gold); }
+        .bg-bg-light { background-color: var(--color-bg-light); }
 
-        /* Estilos específicos para la navegación y componentes */
-        .nav-link { 
-            position: relative; 
-            padding-bottom: 4px; 
-            transition: color 0.3s;
+        /* Estilo para simular el sombreado de la tarjeta del diseño solicitado */
+        .product-card {
+            transition: all 0.3s ease;
         }
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            bottom: 0;
-            width: 0;
-            height: 2px;
-            background-color: var(--color-accent-blue);
-            transition: width 0.3s ease-out;
-        }
-        .nav-link:hover::after, .nav-link.active::after {
-            width: 100%;
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
 <body>
-    <!-- Barra de Navegación (Header) -->
+
+    <!-- Encabezado (Navbar) -->
     <header class="sticky top-0 z-50 bg-white shadow-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <!-- Logo -->
-                <a href="#home" class="flex items-center space-x-3">
-                    <!-- Logo SVG simplificado -->
-                    <svg width="40" height="40" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="5" y="5" width="40" height="40" rx="8" fill="#4A90E2"/>
-                        <rect x="15" y="15" width="20" height="20" rx="4" fill="#3A2A1A"/>
-                        <path d="M12 38L38 12M12 12L38 38" stroke="#A07A48" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                    <span class="text-2xl font-extrabold text-primary-dark tracking-tight">DURPLASS</span>
+                <a href="#inicio" onclick="showView('inicio'); return false;" class="flex-shrink-0 flex items-center">
+                    <!-- Se utiliza una imagen placeholder como logo -->
+                    <img class="h-8 w-auto rounded" src="https://placehold.co/150x50/3A2A1A/ffffff?text=DURPLASS" alt="Logo DURPLASS">
                 </a>
-
-                <!-- Navegación Desktop -->
-                <nav class="hidden md:flex space-x-8 font-semibold">
-                    <a href="#home" class="nav-link text-primary-dark hover:text-accent-blue transition duration-300">Inicio</a>
-                    <a href="#servicios" class="nav-link text-primary-dark hover:text-accent-blue transition duration-300">Servicios</a>
-                    <a href="#contacto" class="nav-link text-primary-dark hover:text-accent-blue transition duration-300">Contacto</a>
-                    <!-- ENLACE ACTUALIZADO -->
-                    <a href="presupuesto.html" class="nav-link text-white bg-accent-blue px-3 py-1 rounded-full shadow-lg hover:bg-primary-dark transition duration-300">
-                        Presupuesto
-                    </a>
-                </nav>
+                
+                <!-- Menú Desktop -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#inicio" onclick="showView('inicio'); return false;" class="text-primary-dark hover:text-accent-blue px-3 py-2 rounded-md text-sm font-medium transition duration-200">Inicio</a>
+                        <a href="#productos" onclick="showView('productos'); return false;" class="text-primary-dark hover:text-accent-blue px-3 py-2 rounded-md text-sm font-medium transition duration-200">Productos</a>
+                        <a href="#servicios" onclick="showView('servicios'); return false;" class="text-primary-dark hover:text-accent-blue px-3 py-2 rounded-md text-sm font-medium transition duration-200">Servicios</a>
+                        <a href="#presupuesto" onclick="showView('presupuesto'); return false;" class="text-primary-dark hover:text-accent-blue px-3 py-2 rounded-md text-sm font-medium transition duration-200 font-bold">Presupuesto</a>
+                        <a href="#contacto" onclick="showView('contacto'); return false;" class="text-primary-dark hover:text-accent-blue px-3 py-2 rounded-md text-sm font-medium transition duration-200">Contacto</a>
+                    </div>
+                </div>
 
                 <!-- Botón de Menú Móvil -->
-                <button id="menu-button" class="md:hidden p-2 rounded-md text-primary-dark hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-accent-blue transition duration-200">
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-                    </svg>
-                </button>
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" id="menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-primary-dark hover:text-accent-blue hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent-blue transition duration-200" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Abrir menú principal</span>
+                        <!-- Icono de Hamburguesa -->
+                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <!-- Icono de Cruz (Oculto) -->
+                        <svg class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
             </div>
-        </div>
+        </nav>
 
-        <!-- Menú Móvil (Desplegable) -->
-        <div id="mobile-menu" class="hidden md:hidden">
-            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50 border-t border-gray-200">
-                <a href="#home" class="block px-3 py-2 rounded-md text-base font-medium text-primary-dark hover:bg-gray-200">Inicio</a>
-                <a href="#servicios" class="block px-3 py-2 rounded-md text-base font-medium text-primary-dark hover:bg-gray-200">Servicios</a>
-                <a href="#contacto" class="block px-3 py-2 rounded-md text-base font-medium text-primary-dark hover:bg-gray-200">Contacto</a>
-                <!-- ENLACE ACTUALIZADO -->
-                <a href="presupuesto.html" class="block px-3 py-2 rounded-md text-base font-medium text-white bg-accent-blue hover:bg-primary-dark">
-                    Presupuesto
-                </a>
+        <!-- Menú Móvil -->
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#inicio" onclick="showView('inicio'); return false;" class="text-primary-dark hover:bg-gray-100 block px-3 py-2 rounded-md text-base font-medium">Inicio</a>
+                <a href="#productos" onclick="showView('productos'); return false;" class="text-primary-dark hover:bg-gray-100 block px-3 py-2 rounded-md text-base font-medium">Productos</a>
+                <a href="#servicios" onclick="showView('servicios'); return false;" class="text-primary-dark hover:bg-gray-100 block px-3 py-2 rounded-md text-base font-medium">Servicios</a>
+                <a href="#presupuesto" onclick="showView('presupuesto'); return false;" class="text-primary-dark hover:bg-gray-100 block px-3 py-2 rounded-md text-base font-medium font-bold">Presupuesto</a>
+                <a href="#contacto" onclick="showView('contacto'); return false;" class="text-primary-dark hover:bg-gray-100 block px-3 py-2 rounded-md text-base font-medium">Contacto</a>
             </div>
         </div>
     </header>
 
-    <main>
-        <!-- Sección Hero/Inicio -->
-        <section id="home" class="relative overflow-hidden bg-primary-dark py-20 sm:py-32">
-            <!-- Fondo con patrón sutil y color acento -->
-            <div class="absolute inset-0 opacity-10" style="background-image: url('https://www.transparenttextures.com/patterns/clean-paper.png');"></div>
-            
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-                <div class="max-w-3xl mx-auto">
-                    <span class="inline-block px-4 py-1 mb-4 text-sm font-semibold text-warm-gold bg-warm-gold bg-opacity-10 rounded-full">
-                        Calidad en PVC y Chapa
-                    </span>
-                    <h1 class="text-5xl sm:text-6xl font-extrabold text-white leading-tight mb-6">
-                        Aberturas de PVC y Puertas de Chapa a Medida
+    <main class="min-h-screen">
+        <!-- SECCIÓN INICIO - Visible por defecto -->
+        <section id="inicio" class="py-16 md:py-24 bg-bg-light">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div class="lg:w-3/4 mx-auto">
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-primary-dark leading-tight mb-4">
+                        Aberturas de <span class="text-accent-blue">PVC</span> y Puertas de Chapa a Medida
                     </h1>
-                    <p class="text-xl text-gray-200 mb-10">
-                        Soluciones duraderas, eficientes y estéticas para su hogar o proyecto. Fabricación con la más alta tecnología.
+                    <p class="text-xl text-gray-700 mb-8">
+                        DURPLASS S.A.S. ofrece soluciones de alta calidad en aberturas para tu proyecto, combinando eficiencia energética, seguridad y diseño.
                     </p>
-                    <a href="presupuesto.html" class="inline-block bg-accent-blue text-white font-bold text-lg px-8 py-3 rounded-xl shadow-2xl hover:bg-warm-gold transform hover:scale-105 transition duration-300 ease-in-out">
-                        ¡Solicite su Presupuesto Ahora!
+                    <a href="#presupuesto" onclick="showView('presupuesto'); return false;" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md shadow-lg btn-primary hover:shadow-xl md:py-4 md:text-lg md:px-10 transition duration-300">
+                        ¡Solicita tu Presupuesto Ahora!
                     </a>
                 </div>
             </div>
         </section>
 
-        <!-- Sección de Servicios/Productos -->
-        <section id="servicios" class="py-16 sm:py-24 bg-color-bg-light">
+        <!-- SECCIÓN PRODUCTOS - CON EL NUEVO DISEÑO DE TARJETAS -->
+        <section id="productos" class="py-16 md:py-24 bg-white content-section" style="display: none;">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-4xl font-extrabold text-center text-primary-dark mb-12">
-                    Nuestros Productos y Experiencia
-                </h2>
-                
-                <div class="grid md:grid-cols-3 gap-10">
-                    <!-- Tarjeta 1: Aberturas de PVC -->
-                    <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 border-t-4 border-accent-blue">
-                        <div class="text-accent-blue mb-4">
-                            <!-- Icono de Ventana SVG -->
-                            <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16M17 6v12M7 6v12" />
-                            </svg>
-                        </div>
-                        <h3 class="text-2xl font-bold text-primary-dark mb-3">Aberturas de PVC</h3>
-                        <p class="text-gray-600">
-                            Máxima eficiencia energética y aislamiento acústico. Ventanas y puertas de PVC de alto rendimiento, resistentes y libres de mantenimiento.
-                        </p>
-                        <ul class="mt-4 space-y-2 text-sm text-gray-700">
-                            <li class="flex items-center"><svg class="w-4 h-4 mr-2 text-warm-gold" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>Aislamiento Superior</li>
-                            <li class="flex items-center"><svg class="w-4 h-4 mr-2 text-warm-gold" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>Diversidad de Diseños</li>
-                        </ul>
-                    </div>
+                <!-- Título de la Sección -->
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl font-extrabold text-primary-dark sm:text-5xl border-b-4 border-accent-blue inline-block pb-1">
+                        Nuestros Productos
+                    </h2>
+                    <p class="mt-4 text-xl text-gray-600">
+                        Soluciones de alta calidad y rendimiento para tu hogar o proyecto.
+                    </p>
+                </div>
+
+                <!-- Contenedor de las Tarjetas (Grid Responsive) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     
-                    <!-- Tarjeta 2: Puertas de Chapa a Medida -->
-                    <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 border-t-4 border-warm-gold">
-                        <div class="text-warm-gold mb-4">
-                            <!-- Icono de Puerta SVG -->
-                            <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12H8m4 0l3-3m-3 3l3 3m5 3l-4-4v-4l4-4m-12 0l-4 4v4l4 4" />
+                    <!-- Tarjeta de Producto 1: Aberturas de PVC -->
+                    <div class="product-card bg-bg-light p-8 rounded-xl shadow-lg flex flex-col items-center text-center border-t-4 border-accent-blue">
+                        <!-- Icono o Imagen Placeholder: Ventana -->
+                        <div class="p-4 mb-4 rounded-full bg-accent-blue/10">
+                            <svg class="w-12 h-12 text-accent-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                             </svg>
                         </div>
-                        <h3 class="text-2xl font-bold text-primary-dark mb-3">Puertas de Chapa</h3>
-                        <p class="text-gray-600">
-                            Robustez y seguridad garantizada. Fabricamos puertas de chapa personalizadas, adaptándonos a sus requerimientos de diseño y medidas.
+                        
+                        <h3 class="text-2xl font-bold text-primary-dark mb-3">Aberturas de PVC</h3>
+                        
+                        <p class="text-gray-600 mb-6 flex-grow">
+                            Sistemas de ventanas y puertas con la mejor aislación térmica y acústica. Durabilidad garantizada y bajo mantenimiento.
                         </p>
-                        <ul class="mt-4 space-y-2 text-sm text-gray-700">
-                            <li class="flex items-center"><svg class="w-4 h-4 mr-2 text-accent-blue" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>Máxima Seguridad</li>
-                            <li class="flex items-center"><svg class="w-4 h-4 mr-2 text-accent-blue" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>Personalización Total</li>
-                        </ul>
+                        
+                        <!-- Botón de Acción -->
+                        <a href="#presupuesto" onclick="showView('presupuesto'); return false;" class="w-full sm:w-auto px-6 py-3 bg-accent-blue text-white font-semibold rounded-lg hover:bg-warm-gold transition duration-300 shadow-md">
+                            Ver Modelos
+                        </a>
                     </div>
 
-                    <!-- Tarjeta 3: Calidad Garantizada -->
-                    <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 border-t-4 border-primary-dark">
-                        <div class="text-primary-dark mb-4">
-                            <!-- Icono de Calidad SVG -->
-                            <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <!-- Tarjeta de Producto 2: Puertas de Chapa a Medida -->
+                    <div class="product-card bg-bg-light p-8 rounded-xl shadow-lg flex flex-col items-center text-center border-t-4 border-accent-blue">
+                        <!-- Icono o Imagen Placeholder: Puerta -->
+                        <div class="p-4 mb-4 rounded-full bg-accent-blue/10">
+                            <svg class="w-12 h-12 text-accent-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                             </svg>
                         </div>
-                        <h3 class="text-2xl font-bold text-primary-dark mb-3">Calidad y Servicio</h3>
-                        <p class="text-gray-600">
-                            Nuestro compromiso es con la excelencia. Usamos materiales de primera calidad y brindamos asesoramiento experto desde el inicio hasta la instalación.
+                        
+                        <h3 class="text-2xl font-bold text-primary-dark mb-3">Puertas de Chapa a Medida</h3>
+                        
+                        <p class="text-gray-600 mb-6 flex-grow">
+                            Máxima seguridad y diseño robusto. Fabricamos puertas de chapa personalizadas según sus requerimientos de tamaño y estilo.
                         </p>
-                        <ul class="mt-4 space-y-2 text-sm text-gray-700">
-                            <li class="flex items-center"><svg class="w-4 h-4 mr-2 text-warm-gold" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>Atención Personalizada</li>
-                            <li class="flex items-center"><svg class="w-4 h-4 mr-2 text-warm-gold" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>Cumplimiento de Plazos</li>
-                        </ul>
+                        
+                        <!-- Botón de Acción -->
+                        <a href="#presupuesto" onclick="showView('presupuesto'); return false;" class="w-full sm:w-auto px-6 py-3 bg-accent-blue text-white font-semibold rounded-lg hover:bg-warm-gold transition duration-300 shadow-md">
+                            Detalles y Presupuesto
+                        </a>
+                    </div>
+
+                    <!-- Tarjeta de Producto 3: Vidrios Especiales (DVH, Laminados) -->
+                    <div class="product-card bg-bg-light p-8 rounded-xl shadow-lg flex flex-col items-center text-center border-t-4 border-accent-blue">
+                        <!-- Icono o Imagen Placeholder: Vidrio -->
+                        <div class="p-4 mb-4 rounded-full bg-accent-blue/10">
+                            <svg class="w-12 h-12 text-accent-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-1.25-3M16 8V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v4m-5 8h14a2 2 0 002-2V8a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        
+                        <h3 class="text-2xl font-bold text-primary-dark mb-3">Vidrios Especiales</h3>
+                        
+                        <p class="text-gray-600 mb-6 flex-grow">
+                            Opciones de Doble Vidriado Hermético (DVH), laminados y templados para protección térmica, acústica y seguridad.
+                        </p>
+                        
+                        <!-- Botón de Acción -->
+                        <a href="#presupuesto" onclick="showView('presupuesto'); return false;" class="w-full sm:w-auto px-6 py-3 bg-accent-blue text-white font-semibold rounded-lg hover:bg-warm-gold transition duration-300 shadow-md">
+                            Consultar Opciones
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+
+        <!-- SECCIÓN SERVICIOS -->
+        <section id="servicios" class="py-16 md:py-24 bg-bg-light content-section" style="display: none;">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-center text-primary-dark mb-12">Servicios Adicionales</h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="text-center p-6 bg-white rounded-lg shadow-md">
+                        <div class="flex items-center justify-center w-12 h-12 rounded-full bg-accent-blue/10 mx-auto mb-4">
+                            <svg class="w-6 h-6 text-accent-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2m-9 0V3h4v2m-4 0v2h4V5m8-2h-4v2h4V3z" /></svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-primary-dark">Asesoramiento Personalizado</h3>
+                        <p class="text-sm text-gray-600 mt-2">Guía en la elección de aberturas según tus necesidades de obra y presupuesto.</p>
+                    </div>
+                    <div class="text-center p-6 bg-white rounded-lg shadow-md">
+                        <div class="flex items-center justify-center w-12 h-12 rounded-full bg-warm-gold/10 mx-auto mb-4">
+                            <svg class="w-6 h-6 text-warm-gold" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37h.144c.483-.166.974-.32 1.48-.466z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-primary-dark">Fabricación a Medida</h3>
+                        <p class="text-sm text-gray-600 mt-2">Adaptamos nuestros productos a las especificaciones exactas de tu proyecto.</p>
+                    </div>
+                    <div class="text-center p-6 bg-white rounded-lg shadow-md">
+                        <div class="flex items-center justify-center w-12 h-12 rounded-full bg-primary-dark/10 mx-auto mb-4">
+                            <svg class="w-6 h-6 text-primary-dark" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l-2 2h-1a2 2 0 01-2-2V4a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2h-1l-2-2h-1m-1-4V8m0 4v4m-4-4v4m8-4v4" /></svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-primary-dark">Logística de Entrega</h3>
+                        <p class="text-sm text-gray-600 mt-2">Coordinamos la entrega de tu pedido en tiempo y forma a tu lugar de obra.</p>
+                    </div>
+                    <div class="text-center p-6 bg-white rounded-lg shadow-md">
+                        <div class="flex items-center justify-center w-12 h-12 rounded-full bg-accent-blue/10 mx-auto mb-4">
+                            <svg class="w-6 h-6 text-accent-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-primary-dark">Garantía de Calidad</h3>
+                        <p class="text-sm text-gray-600 mt-2">Trabajamos con materiales de primera línea y procesos certificados para la máxima durabilidad.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Sección de Llamada a la Acción (CTA) -->
-        <section class="bg-warm-gold py-16">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h2 class="text-3xl sm:text-4xl font-extrabold text-white mb-4">
-                    ¿Listo para su Próximo Proyecto?
-                </h2>
-                <p class="text-lg text-white opacity-90 mb-8 max-w-2xl mx-auto">
-                    Solicite una cotización sin compromiso y descubra la diferencia DURPLASS en calidad y servicio.
-                </p>
-                <a href="presupuesto.html" class="inline-block bg-primary-dark text-white font-bold text-lg px-8 py-3 rounded-xl shadow-2xl hover:bg-accent-blue transform hover:scale-105 transition duration-300 ease-in-out">
-                    Pedir Presupuesto Personalizado
-                </a>
+        <!-- SECCIÓN PRESUPUESTO - CORREGIDA Y FUNCIONAL -->
+        <section id="presupuesto" class="py-16 md:py-24 bg-white content-section" style="display: none;">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-center text-accent-blue mb-4">Solicitud de Presupuesto</h2>
+                <p class="text-center text-gray-600 mb-8">Completa el formulario y nos contactaremos contigo lo antes posible con una cotización.</p>
+                
+                <!-- Mensajes de estado (éxito/error) -->
+                <div id="form-status" class="hidden p-4 rounded-md text-white font-medium mb-4" role="alert"></div>
+
+                <form id="budget-form" class="space-y-6 bg-bg-light p-8 rounded-xl shadow-2xl border border-gray-200">
+                    <!-- Datos de Contacto -->
+                    <div>
+                        <h3 class="text-xl font-semibold text-primary-dark mb-4 border-b pb-2">Información de Contacto</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="clientName" class="block text-sm font-medium text-gray-700">Nombre Completo (*)</label>
+                                <input type="text" name="clientName" id="clientName" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-accent-blue focus:border-accent-blue" placeholder="Juan Pérez">
+                            </div>
+                            <div>
+                                <label for="clientEmail" class="block text-sm font-medium text-gray-700">Email (*)</label>
+                                <input type="email" name="clientEmail" id="clientEmail" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-accent-blue focus:border-accent-blue" placeholder="correo@ejemplo.com">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label for="clientPhone" class="block text-sm font-medium text-gray-700">Teléfono (WhatsApp)</label>
+                                <input type="tel" name="clientPhone" id="clientPhone" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-accent-blue focus:border-accent-blue" placeholder="+54 9 11 1234 5678">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Datos del Proyecto -->
+                    <div>
+                        <h3 class="text-xl font-semibold text-primary-dark mb-4 border-b pb-2">Detalles del Proyecto</h3>
+                        
+                        <div class="mb-4">
+                            <label for="projectType" class="block text-sm font-medium text-gray-700">Tipo de Obra (*)</label>
+                            <select id="projectType" name="projectType" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-accent-blue focus:border-accent-blue bg-white">
+                                <option value="">Selecciona una opción</option>
+                                <option value="obra-nueva">Obra Nueva</option>
+                                <option value="remodelacion-reemplazo">Remodelación / Reemplazo</option>
+                                <option value="reparacion">Reparación Específica</option>
+                                <option value="otro">Otro</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <span class="block text-sm font-medium text-gray-700 mb-2">Producto de Interés (*):</span>
+                            <div class="flex flex-wrap gap-4">
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" name="productInterest" value="pvc" class="form-checkbox text-accent-blue h-5 w-5 rounded">
+                                    <span class="ml-2 text-gray-700">Aberturas de PVC</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" name="productInterest" value="chapa" class="form-checkbox text-accent-blue h-5 w-5 rounded">
+                                    <span class="ml-2 text-gray-700">Puertas de Chapa</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" name="productInterest" value="vidrios" class="form-checkbox text-accent-blue h-5 w-5 rounded">
+                                    <span class="ml-2 text-gray-700">Vidrios Especiales</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="description" class="block text-sm font-medium text-gray-700">Detalles y Especificaciones (cantidad, medidas aproximadas, tipo de apertura, etc.) (*)</label>
+                            <textarea id="description" name="description" rows="4" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-accent-blue focus:border-accent-blue" placeholder="Necesito 8 ventanas de PVC (2 de 1.5x1.2m corredizas y 6 de 0.6x0.4m batientes) y una puerta de chapa de seguridad de 0.9x2.1m."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Botón de Envío -->
+                    <div class="pt-4">
+                        <button type="submit" id="submit-button" class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-lg btn-primary hover:shadow-xl transition duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-blue disabled:opacity-50">
+                            Enviar Solicitud de Presupuesto
+                        </button>
+                    </div>
+                </form>
+
             </div>
         </section>
 
-        <!-- Sección de Contacto e Información -->
-        <section id="contacto" class="py-16 sm:py-24 bg-white">
+        <!-- SECCIÓN CONTACTO -->
+        <section id="contacto" class="py-16 md:py-24 bg-bg-light content-section" style="display: none;">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-4xl font-extrabold text-center text-primary-dark mb-12">
-                    Contáctenos
-                </h2>
-                <div class="grid md:grid-cols-3 gap-10 text-center">
-                    <!-- Tarjeta 1: Teléfono -->
-                    <div class="bg-color-bg-light p-6 rounded-xl shadow-lg border-t-2 border-accent-blue">
-                        <div class="text-accent-blue mb-3 mx-auto w-10 h-10">
-                            <svg class="w-full h-full" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498A1 1 0 0121 17.72V19a2 2 0 01-2 2h-1c-2.485 0-4.807-.756-6.794-2.175A14.996 14.996 0 015.01 7.21C3.792 5.223 3.036 2.899 3 1v18z" /></svg>
+                <h2 class="text-3xl font-bold text-center text-primary-dark mb-12">Contáctanos</h2>
+                <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                    <!-- Opción 1: Email -->
+                    <div class="p-6 bg-white rounded-lg shadow-xl">
+                        <div class="flex items-center justify-center w-12 h-12 rounded-full bg-accent-blue/20 mx-auto mb-4">
+                            <svg class="w-6 h-6 text-accent-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-17 0V6a2 2 0 012-2h12a2 2 0 012 2v2m-17 0l9 6 9-6" /></svg>
                         </div>
-                        <h3 class="text-lg font-bold text-primary-dark">Teléfono</h3>
-                        <p class="mt-1 text-gray-600">+54 9 11 1234-5678</p>
-                        <a href="tel:+5491112345678" class="text-accent-blue font-medium hover:text-warm-gold transition duration-200">Llamar Ahora</a>
+                        <h3 class="text-lg font-bold text-primary-dark">Email</h3>
+                        <p class="mt-1 text-gray-600">ventas@durplass.com.ar</p>
+                        <a href="mailto:ventas@durplass.com.ar" class="text-accent-blue font-medium hover:text-warm-gold transition duration-200">Enviar Correo</a>
                     </div>
 
-                    <!-- Tarjeta 2: Email -->
-                    <div class="bg-color-bg-light p-6 rounded-xl shadow-lg border-t-2 border-warm-gold">
-                        <div class="text-warm-gold mb-3 mx-auto w-10 h-10">
-                            <svg class="w-full h-full" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-2 4v7a2 2 0 01-2 2H5a2 2 0 01-2-2v-7m18-6H3a2 2 0 00-2 2v14a2 2 0 002 2h18a2 2 0 002-2V8a2 2 0 00-2-2z" /></svg>
+                    <!-- Opción 2: Teléfono/WhatsApp -->
+                    <div class="p-6 bg-white rounded-lg shadow-xl">
+                        <div class="flex items-center justify-center w-12 h-12 rounded-full bg-warm-gold/20 mx-auto mb-4">
+                            <svg class="w-6 h-6 text-warm-gold" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
                         </div>
-                        <h3 class="text-lg font-bold text-primary-dark">Correo Electrónico</h3>
-                        <p class="mt-1 text-gray-600">contacto@durplass.com.ar</p>
-                        <a href="mailto:contacto@durplass.com.ar" class="text-accent-blue font-medium hover:text-warm-gold transition duration-200">Enviar Email</a>
+                        <h3 class="text-lg font-bold text-primary-dark">Teléfono / WhatsApp</h3>
+                        <p class="mt-1 text-gray-600">+54 9 11 XXXX-XXXX</p>
+                        <a href="https://wa.me/54911xxxxxxxx" target="_blank" class="text-accent-blue font-medium hover:text-warm-gold transition duration-200">Enviar WhatsApp</a>
                     </div>
 
-                    <!-- Tarjeta 3: Ubicación -->
-                    <div class="bg-color-bg-light p-6 rounded-xl shadow-lg border-t-2 border-primary-dark">
-                        <div class="text-primary-dark mb-3 mx-auto w-10 h-10">
-                            <svg class="w-full h-full" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    <!-- Opción 3: Ubicación (Oficina) -->
+                    <div class="p-6 bg-white rounded-lg shadow-xl">
+                        <div class="flex items-center justify-center w-12 h-12 rounded-full bg-primary-dark/20 mx-auto mb-4">
+                            <svg class="w-6 h-6 text-primary-dark" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                         </div>
                         <h3 class="text-lg font-bold text-primary-dark">Ubicación</h3>
                         <p class="mt-1 text-gray-600">Buenos Aires, Argentina</p>
-                        <a href="presupuesto.html" class="text-accent-blue font-medium hover:text-warm-gold transition duration-200">Solicitar Presupuesto para Dirección</a>
+                        <!-- Usar showView para evitar el alert() prohibido -->
+                        <a href="#presupuesto" onclick="showView('presupuesto'); return false;" class="text-accent-blue font-medium hover:text-warm-gold transition duration-200">Solicitar Dirección</a>
                     </div>
                 </div>
             </div>
@@ -253,57 +374,173 @@
         </div>
     </footer>
 
-    <!-- JavaScript para funcionalidad básica -->
+    <!-- Firebase SDK (Version 11.6.1) -->
     <script type="module">
-        // Importaciones de Firebase (aunque solo se necesita la inicialización general aquí)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Variables Globales (Disponibles en el entorno de la plataforma)
+        // Global variables provided by the environment
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-        let db, auth;
-        let userId = null;
+        let db;
+        let auth;
+        let userId = 'anonymous'; 
 
-        setLogLevel('Debug');
-
+        // Function to initialize Firebase and authenticate
         async function initializeFirebase() {
-            try {
-                if (Object.keys(firebaseConfig).length > 0) {
-                    const app = initializeApp(firebaseConfig);
-                    db = getFirestore(app);
-                    auth = getAuth(app);
-                    
-                    // Manejo de autenticación
-                    onAuthStateChanged(auth, (user) => {
-                        if (user) {
-                            userId = user.uid;
-                            console.log("Usuario autenticado. UID:", userId);
-                        } else {
-                            userId = null;
-                            console.log("Usuario no autenticado.");
-                        }
-                    });
+            if (!firebaseConfig) {
+                console.error("Firebase config is missing. Cannot initialize Firestore.");
+                return;
+            }
 
-                    // Autenticación inicial
-                    if (initialAuthToken) {
-                        await signInWithCustomToken(auth, initialAuthToken);
-                        console.log("Autenticación con token custom exitosa.");
-                    } else {
-                        await signInAnonymously(auth);
-                        console.log("Autenticación anónima exitosa.");
-                    }
+            try {
+                // Set debug level for detailed logs
+                setLogLevel('debug'); 
+
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                // Authenticate using the provided token or anonymously
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
                 } else {
-                    console.warn("Firebase Config no está disponible. Las funciones de DB no estarán activas.");
+                    await signInAnonymously(auth);
                 }
+                
+                // Get the current user ID
+                userId = auth.currentUser?.uid || crypto.randomUUID();
+                console.log(`Firebase initialized. User ID: ${userId}`);
+
             } catch (error) {
-                console.error("Error al inicializar o autenticar Firebase:", error);
+                console.error("Error during Firebase initialization or authentication:", error);
+                // Mostrar un mensaje de error al usuario
+                window.showMessage(`Error de conexión con el sistema de datos. Intenta más tarde.`, 'bg-red-500');
             }
         }
+        
+        // Función para enviar la solicitud de presupuesto
+        window.submitBudgetRequest = async function(event) {
+            event.preventDefault();
+            
+            const submitButton = document.getElementById('submit-button');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Enviando...';
+            
+            if (!db) {
+                console.error("Firestore not initialized.");
+                window.showMessage('Error interno: El sistema de datos no está listo.', 'bg-red-500');
+                submitButton.disabled = false;
+                submitButton.textContent = 'Enviar Solicitud de Presupuesto';
+                return;
+            }
+
+            try {
+                // Recolectar datos del formulario
+                const form = document.getElementById('budget-form');
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
+
+                // Manejo de productos de interés (checkboxes)
+                const productCheckboxes = form.querySelectorAll('input[name="productInterest"]:checked');
+                const interests = Array.from(productCheckboxes).map(cb => cb.value);
+
+                // Validaciones básicas de campos
+                if (!data.clientName || !data.clientEmail || !data.projectType || !data.description || interests.length === 0) {
+                    window.showMessage('Por favor, completa todos los campos obligatorios (*) y selecciona al menos un producto.', 'bg-yellow-500');
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Enviar Solicitud de Presupuesto';
+                    return;
+                }
+
+                // Estructura del documento a guardar
+                const budgetRequest = {
+                    clientName: data.clientName,
+                    clientEmail: data.clientEmail,
+                    clientPhone: data.clientPhone || 'No proporcionado',
+                    projectType: data.projectType,
+                    productInterest: interests,
+                    description: data.description,
+                    submissionDate: new Date().toISOString(),
+                    userId: userId // Registrar quién envió la solicitud
+                };
+
+                // Ruta de la colección: /artifacts/{appId}/public/data/budget_requests
+                const collectionPath = `artifacts/${appId}/public/data/budget_requests`;
+                
+                // Agregar el documento a Firestore
+                const docRef = await addDoc(collection(db, collectionPath), budgetRequest);
+
+                window.showMessage('¡Tu solicitud de presupuesto fue enviada con éxito! Nos contactaremos pronto.', 'bg-green-500');
+                form.reset(); // Limpiar el formulario
+                
+                console.log("Documento de presupuesto escrito con ID: ", docRef.id);
+
+            } catch (e) {
+                console.error("Error al añadir el documento de presupuesto: ", e);
+                window.showMessage('Hubo un error al enviar tu solicitud. Por favor, revisa tu conexión o intenta más tarde.', 'bg-red-500');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Enviar Solicitud de Presupuesto';
+            }
+        }
+
+        // Initialize Firebase on window load
+        window.addEventListener('load', initializeFirebase);
+    </script>
+
+    <!-- Scripts de Interfaz -->
+    <script>
+        // Función para mostrar mensajes de estado (éxito/error/alerta)
+        window.showMessage = function(message, className) {
+            const statusMessage = document.getElementById('form-status');
+            
+            if (!statusMessage) {
+                console.error("DOM element 'form-status' not found. Skipping message display.");
+                return;
+            }
+
+            statusMessage.classList.remove('hidden', 'bg-red-500', 'bg-green-500', 'bg-yellow-500');
+            statusMessage.classList.add(className);
+            statusMessage.textContent = message;
+            
+            setTimeout(() => {
+                statusMessage.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Manejo de la navegación de vistas (CORRECCIÓN IMPLEMENTADA AQUÍ)
+        function showView(viewId) {
+            // Obtener todas las secciones que deben ser ocultadas/mostradas
+            const views = document.querySelectorAll('.content-section');
+            
+            // Ocultar todas las secciones de contenido
+            views.forEach(view => {
+                view.style.display = 'none'; 
+            });
+            
+            // La sección 'inicio' no tiene 'content-section', se maneja por separado si es necesario.
+            const targetView = document.getElementById(viewId);
+            const homeView = document.getElementById('inicio');
+
+            if (viewId === 'inicio') {
+                if (homeView) homeView.style.display = 'block';
+            } else if (targetView) {
+                if (homeView) homeView.style.display = 'none'; // Ocultar inicio si vamos a otra sección
+                targetView.style.display = 'block'; // Mostrar la vista solicitada
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                console.warn(`View with ID ${viewId} not found.`);
+            }
+        }
+
+        // Inicializar la vista en 'inicio' al cargar
+        document.addEventListener('DOMContentLoaded', () => {
+            showView('inicio');
+        });
 
         // Toggle mobile menu visibility
         document.getElementById('menu-button').addEventListener('click', function() {
@@ -319,8 +556,8 @@
             });
         });
 
-        // Start initialization when the window loads
-        window.onload = initializeFirebase;
+        // Asignar el listener al formulario de presupuesto
+        document.getElementById('budget-form').addEventListener('submit', window.submitBudgetRequest);
     </script>
 </body>
 </html>
