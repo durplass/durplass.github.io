@@ -8,13 +8,32 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     
+    <script>
+        // Configuración de Tailwind para usar colores personalizados
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-dark': '#3A2A1A', 
+                        'accent-blue': '#4A90E2',  
+                        'warm-gold': '#A07A48',   
+                        'bg-light': '#F8F8F8',    
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
     <style>
         /* Paleta de Colores DURPLASS inspirada en el logo */
         :root {
-            --color-primary-dark: #3A2A1A; /* Marrón Oscuro - Base del logo */
-            --color-accent-blue: #4A90E2; /* Azul - Ventanas/Acento */
-            --color-warm-gold: #A07A48; /* Dorado - Acento Cálido */
-            --color-bg-light: #F8F8F8; /* Fondo de Secciones */
+            --color-primary-dark: #3A2A1A; 
+            --color-accent-blue: #4A90E2; 
+            --color-warm-gold: #A07A48; 
+            --color-bg-light: #F8F8F8; 
             --color-text-main: #222;
             --color-white: #ffffff;
             font-family: 'Inter', sans-serif;
@@ -65,7 +84,6 @@
             <div class="flex justify-between items-center h-16">
                 <!-- Logo -->
                 <a href="#inicio" onclick="showView('inicio'); return false;" class="flex-shrink-0 flex items-center">
-                    <!-- Se utiliza una imagen placeholder como logo -->
                     <img class="h-8 w-auto rounded" src="https://placehold.co/150x50/3A2A1A/ffffff?text=DURPLASS" alt="Logo DURPLASS">
                 </a>
                 
@@ -84,11 +102,9 @@
                 <div class="-mr-2 flex md:hidden">
                     <button type="button" id="menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-primary-dark hover:text-accent-blue hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent-blue transition duration-200" aria-controls="mobile-menu" aria-expanded="false">
                         <span class="sr-only">Abrir menú principal</span>
-                        <!-- Icono de Hamburguesa -->
                         <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
-                        <!-- Icono de Cruz (Oculto) -->
                         <svg class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -127,7 +143,7 @@
             </div>
         </section>
 
-        <!-- SECCIÓN PRODUCTOS - CON EL NUEVO DISEÑO DE TARJETAS -->
+        <!-- SECCIÓN PRODUCTOS -->
         <section id="productos" class="py-16 md:py-24 bg-white content-section" style="display: none;">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <!-- Título de la Sección -->
@@ -145,7 +161,6 @@
                     
                     <!-- Tarjeta de Producto 1: Aberturas de PVC -->
                     <div class="product-card bg-bg-light p-8 rounded-xl shadow-lg flex flex-col items-center text-center border-t-4 border-accent-blue">
-                        <!-- Icono o Imagen Placeholder: Ventana -->
                         <div class="p-4 mb-4 rounded-full bg-accent-blue/10">
                             <svg class="w-12 h-12 text-accent-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
@@ -158,7 +173,6 @@
                             Sistemas de ventanas y puertas con la mejor aislación térmica y acústica. Durabilidad garantizada y bajo mantenimiento.
                         </p>
                         
-                        <!-- Botón de Acción -->
                         <a href="#presupuesto" onclick="showView('presupuesto'); return false;" class="w-full sm:w-auto px-6 py-3 bg-accent-blue text-white font-semibold rounded-lg hover:bg-warm-gold transition duration-300 shadow-md">
                             Ver Modelos
                         </a>
@@ -166,7 +180,6 @@
 
                     <!-- Tarjeta de Producto 2: Puertas de Chapa a Medida -->
                     <div class="product-card bg-bg-light p-8 rounded-xl shadow-lg flex flex-col items-center text-center border-t-4 border-accent-blue">
-                        <!-- Icono o Imagen Placeholder: Puerta -->
                         <div class="p-4 mb-4 rounded-full bg-accent-blue/10">
                             <svg class="w-12 h-12 text-accent-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
@@ -179,7 +192,6 @@
                             Máxima seguridad y diseño robusto. Fabricamos puertas de chapa personalizadas según sus requerimientos de tamaño y estilo.
                         </p>
                         
-                        <!-- Botón de Acción -->
                         <a href="#presupuesto" onclick="showView('presupuesto'); return false;" class="w-full sm:w-auto px-6 py-3 bg-accent-blue text-white font-semibold rounded-lg hover:bg-warm-gold transition duration-300 shadow-md">
                             Detalles y Presupuesto
                         </a>
@@ -187,7 +199,6 @@
 
                     <!-- Tarjeta de Producto 3: Vidrios Especiales (DVH, Laminados) -->
                     <div class="product-card bg-bg-light p-8 rounded-xl shadow-lg flex flex-col items-center text-center border-t-4 border-accent-blue">
-                        <!-- Icono o Imagen Placeholder: Vidrio -->
                         <div class="p-4 mb-4 rounded-full bg-accent-blue/10">
                             <svg class="w-12 h-12 text-accent-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-1.25-3M16 8V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v4m-5 8h14a2 2 0 002-2V8a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
@@ -200,7 +211,6 @@
                             Opciones de Doble Vidriado Hermético (DVH), laminados y templados para protección térmica, acústica y seguridad.
                         </p>
                         
-                        <!-- Botón de Acción -->
                         <a href="#presupuesto" onclick="showView('presupuesto'); return false;" class="w-full sm:w-auto px-6 py-3 bg-accent-blue text-white font-semibold rounded-lg hover:bg-warm-gold transition duration-300 shadow-md">
                             Consultar Opciones
                         </a>
@@ -248,19 +258,19 @@
             </div>
         </section>
 
-        <!-- SECCIÓN PRESUPUESTO - CORREGIDA Y FUNCIONAL -->
+        <!-- SECCIÓN PRESUPUESTO - FORMULARIO MEJORADO -->
         <section id="presupuesto" class="py-16 md:py-24 bg-white content-section" style="display: none;">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-3xl font-bold text-center text-accent-blue mb-4">Solicitud de Presupuesto</h2>
-                <p class="text-center text-gray-600 mb-8">Completa el formulario y nos contactaremos contigo lo antes posible con una cotización.</p>
+                <h2 class="text-3xl font-bold text-center text-accent-blue mb-4">Solicitud Detallada de Presupuesto</h2>
+                <p class="text-center text-gray-600 mb-8">Cuanto más detalles nos brindes, más precisa será nuestra cotización.</p>
                 
                 <!-- Mensajes de estado (éxito/error) -->
                 <div id="form-status" class="hidden p-4 rounded-md text-white font-medium mb-4" role="alert"></div>
 
-                <form id="budget-form" class="space-y-6 bg-bg-light p-8 rounded-xl shadow-2xl border border-gray-200">
-                    <!-- Datos de Contacto -->
+                <form id="budget-form" class="space-y-6 bg-bg-light p-8 rounded-xl shadow-2xl border border-gray-200" onsubmit="window.submitBudgetRequest(event)">
+                    <!-- Información de Contacto (General) -->
                     <div>
-                        <h3 class="text-xl font-semibold text-primary-dark mb-4 border-b pb-2">Información de Contacto</h3>
+                        <h3 class="text-xl font-semibold text-primary-dark mb-4 border-b pb-2">1. Datos Personales y de Contacto</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label for="clientName" class="block text-sm font-medium text-gray-700">Nombre Completo (*)</label>
@@ -270,30 +280,61 @@
                                 <label for="clientEmail" class="block text-sm font-medium text-gray-700">Email (*)</label>
                                 <input type="email" name="clientEmail" id="clientEmail" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-accent-blue focus:border-accent-blue" placeholder="correo@ejemplo.com">
                             </div>
-                            <div class="md:col-span-2">
-                                <label for="clientPhone" class="block text-sm font-medium text-gray-700">Teléfono (WhatsApp)</label>
-                                <input type="tel" name="clientPhone" id="clientPhone" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-accent-blue focus:border-accent-blue" placeholder="+54 9 11 1234 5678">
+                            <div>
+                                <label for="clientPhone" class="block text-sm font-medium text-gray-700">Teléfono (WhatsApp) (*)</label>
+                                <input type="tel" name="clientPhone" id="clientPhone" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-accent-blue focus:border-accent-blue" placeholder="+54 9 11 1234 5678">
+                            </div>
+                            <div>
+                                <label for="clientCompany" class="block text-sm font-medium text-gray-700">Empresa o Profesional (Opcional)</label>
+                                <input type="text" name="clientCompany" id="clientCompany" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-accent-blue focus:border-accent-blue" placeholder="Estudio Arquitectura X">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Datos del Proyecto -->
+                    <!-- Datos del Proyecto (Ubicación y Tipo) -->
                     <div>
-                        <h3 class="text-xl font-semibold text-primary-dark mb-4 border-b pb-2">Detalles del Proyecto</h3>
-                        
-                        <div class="mb-4">
-                            <label for="projectType" class="block text-sm font-medium text-gray-700">Tipo de Obra (*)</label>
-                            <select id="projectType" name="projectType" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-accent-blue focus:border-accent-blue bg-white">
-                                <option value="">Selecciona una opción</option>
-                                <option value="obra-nueva">Obra Nueva</option>
-                                <option value="remodelacion-reemplazo">Remodelación / Reemplazo</option>
-                                <option value="reparacion">Reparación Específica</option>
-                                <option value="otro">Otro</option>
-                            </select>
+                        <h3 class="text-xl font-semibold text-primary-dark mb-4 border-b pb-2">2. Ubicación y Tipo de Obra</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label for="projectProvince" class="block text-sm font-medium text-gray-700">Provincia (*)</label>
+                                <input type="text" name="projectProvince" id="projectProvince" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-accent-blue focus:border-accent-blue" placeholder="Buenos Aires / Tierra del Fuego">
+                            </div>
+                            <div>
+                                <label for="projectCity" class="block text-sm font-medium text-gray-700">Ciudad (*)</label>
+                                <input type="text" name="projectCity" id="projectCity" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-accent-blue focus:border-accent-blue" placeholder="Tristán Suárez / Ushuaia">
+                            </div>
+                            <div>
+                                <label for="projectType" class="block text-sm font-medium text-gray-700">Tipo de Obra (*)</label>
+                                <select id="projectType" name="projectType" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-accent-blue focus:border-accent-blue bg-white">
+                                    <option value="">Selecciona...</option>
+                                    <option value="obra-nueva">Obra Nueva</option>
+                                    <option value="remodelacion-reemplazo">Remodelación / Reemplazo</option>
+                                    <option value="otro">Otro</option>
+                                </select>
+                            </div>
                         </div>
+
+                        <div class="mt-6">
+                            <span class="block text-sm font-medium text-gray-700 mb-2">¿Requiere Servicio de Instalación? (*):</span>
+                            <div class="flex flex-wrap gap-6">
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="installationNeeded" value="si" required class="form-radio text-accent-blue h-4 w-4">
+                                    <span class="ml-2 text-gray-700">Sí, necesito instalación.</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="installationNeeded" value="no" required class="form-radio text-accent-blue h-4 w-4">
+                                    <span class="ml-2 text-gray-700">No, solo compra de productos.</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detalles del Pedido -->
+                    <div>
+                        <h3 class="text-xl font-semibold text-primary-dark mb-4 border-b pb-2">3. Productos y Especificaciones</h3>
                         
                         <div class="mb-4">
-                            <span class="block text-sm font-medium text-gray-700 mb-2">Producto de Interés (*):</span>
+                            <span class="block text-sm font-medium text-gray-700 mb-2">Producto(s) de Interés (*):</span>
                             <div class="flex flex-wrap gap-4">
                                 <label class="inline-flex items-center">
                                     <input type="checkbox" name="productInterest" value="pvc" class="form-checkbox text-accent-blue h-5 w-5 rounded">
@@ -301,18 +342,29 @@
                                 </label>
                                 <label class="inline-flex items-center">
                                     <input type="checkbox" name="productInterest" value="chapa" class="form-checkbox text-accent-blue h-5 w-5 rounded">
-                                    <span class="ml-2 text-gray-700">Puertas de Chapa</span>
+                                    <span class="ml-2 text-gray-700">Puertas/Portones de Chapa</span>
                                 </label>
                                 <label class="inline-flex items-center">
                                     <input type="checkbox" name="productInterest" value="vidrios" class="form-checkbox text-accent-blue h-5 w-5 rounded">
-                                    <span class="ml-2 text-gray-700">Vidrios Especiales</span>
+                                    <span class="ml-2 text-gray-700">Vidrios Especiales (DVH, etc.)</span>
                                 </label>
                             </div>
                         </div>
 
-                        <div>
-                            <label for="description" class="block text-sm font-medium text-gray-700">Detalles y Especificaciones (cantidad, medidas aproximadas, tipo de apertura, etc.) (*)</label>
-                            <textarea id="description" name="description" rows="4" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-accent-blue focus:border-accent-blue" placeholder="Necesito 8 ventanas de PVC (2 de 1.5x1.2m corredizas y 6 de 0.6x0.4m batientes) y una puerta de chapa de seguridad de 0.9x2.1m."></textarea>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="pvcDetails" class="block text-sm font-medium text-gray-700">Detalles de Aberturas de PVC (Cantidad, medidas, tipo de apertura, color)</label>
+                                <textarea id="pvcDetails" name="pvcDetails" rows="3" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-accent-blue focus:border-accent-blue" placeholder="Ej: 8 ventanas de PVC, 2 corredizas 1.5x1.2m, color blanco."></textarea>
+                            </div>
+                            <div>
+                                <label for="chapaDetails" class="block text-sm font-medium text-gray-700">Detalles de Puertas/Chapa (Cantidad, medidas, tipo de hoja, seguridad, terminación)</label>
+                                <textarea id="chapaDetails" name="chapaDetails" rows="3" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-accent-blue focus:border-accent-blue" placeholder="Ej: 1 Puerta de seguridad 0.9x2.1m, doble chapa inyectada."></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <label for="additionalNotes" class="block text-sm font-medium text-gray-700">Notas Adicionales / Comentarios</label>
+                            <textarea id="additionalNotes" name="additionalNotes" rows="2" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-accent-blue focus:border-accent-blue" placeholder="El proyecto inicia en 3 meses."></textarea>
                         </div>
                     </div>
 
@@ -327,40 +379,38 @@
             </div>
         </section>
 
-        <!-- SECCIÓN CONTACTO -->
+        <!-- SECCIÓN CONTACTO - INFORMACIÓN DETALLADA -->
         <section id="contacto" class="py-16 md:py-24 bg-bg-light content-section" style="display: none;">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-3xl font-bold text-center text-primary-dark mb-12">Contáctanos</h2>
-                <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                    <!-- Opción 1: Email -->
-                    <div class="p-6 bg-white rounded-lg shadow-xl">
-                        <div class="flex items-center justify-center w-12 h-12 rounded-full bg-accent-blue/20 mx-auto mb-4">
-                            <svg class="w-6 h-6 text-accent-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-17 0V6a2 2 0 012-2h12a2 2 0 012 2v2m-17 0l9 6 9-6" /></svg>
+                <h2 class="text-3xl font-bold text-center text-primary-dark mb-12">Contáctanos y Ubicaciones</h2>
+                <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    
+                    <!-- Tarjeta 1: Contacto Gerencia/Fábrica (Tristán Suárez) -->
+                    <div class="p-6 bg-white rounded-lg shadow-xl border-t-4 border-warm-gold md:col-span-2 lg:col-span-2">
+                        <div class="flex items-center mb-4">
+                            <svg class="w-8 h-8 text-warm-gold mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
+                            <h3 class="text-xl font-bold text-primary-dark">Fábrica / Gerencia</h3>
                         </div>
-                        <h3 class="text-lg font-bold text-primary-dark">Email</h3>
-                        <p class="mt-1 text-gray-600">ventas@durplass.com.ar</p>
-                        <a href="mailto:ventas@durplass.com.ar" class="text-accent-blue font-medium hover:text-warm-gold transition duration-200">Enviar Correo</a>
+                        <p class="mt-1 text-gray-700 font-semibold">Ubicación:</p>
+                        <p class="text-gray-600">Tristán Suárez, Buenos Aires</p>
+                        <p class="mt-3 text-gray-700 font-semibold">Teléfono:</p>
+                        <p class="text-gray-600">(011) 5095-0613</p>
+                        <p class="mt-3 text-gray-700 font-semibold">Email Administración:</p>
+                        <p class="text-gray-600"><a href="mailto:Durplass.tdf@gmail.com" class="text-accent-blue hover:underline">Durplass.tdf@gmail.com</a></p>
                     </div>
 
-                    <!-- Opción 2: Teléfono/WhatsApp -->
-                    <div class="p-6 bg-white rounded-lg shadow-xl">
-                        <div class="flex items-center justify-center w-12 h-12 rounded-full bg-warm-gold/20 mx-auto mb-4">
-                            <svg class="w-6 h-6 text-warm-gold" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                    <!-- Tarjeta 2: Oficina de Ventas (Ushuaia) -->
+                    <div class="p-6 bg-white rounded-lg shadow-xl border-t-4 border-accent-blue md:col-span-2 lg:col-span-2">
+                        <div class="flex items-center mb-4">
+                            <svg class="w-8 h-8 text-accent-blue mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                            <h3 class="text-xl font-bold text-primary-dark">Punto Central de Ventas</h3>
                         </div>
-                        <h3 class="text-lg font-bold text-primary-dark">Teléfono / WhatsApp</h3>
-                        <p class="mt-1 text-gray-600">+54 9 11 XXXX-XXXX</p>
-                        <a href="https://wa.me/54911xxxxxxxx" target="_blank" class="text-accent-blue font-medium hover:text-warm-gold transition duration-200">Enviar WhatsApp</a>
-                    </div>
-
-                    <!-- Opción 3: Ubicación (Oficina) -->
-                    <div class="p-6 bg-white rounded-lg shadow-xl">
-                        <div class="flex items-center justify-center w-12 h-12 rounded-full bg-primary-dark/20 mx-auto mb-4">
-                            <svg class="w-6 h-6 text-primary-dark" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                        </div>
-                        <h3 class="text-lg font-bold text-primary-dark">Ubicación</h3>
-                        <p class="mt-1 text-gray-600">Buenos Aires, Argentina</p>
-                        <!-- Usar showView para evitar el alert() prohibido -->
-                        <a href="#presupuesto" onclick="showView('presupuesto'); return false;" class="text-accent-blue font-medium hover:text-warm-gold transition duration-200">Solicitar Dirección</a>
+                        <p class="mt-1 text-gray-700 font-semibold">Ubicación:</p>
+                        <p class="text-gray-600">Ushuaia, Tierra del Fuego</p>
+                        <p class="mt-3 text-gray-700 font-semibold">Teléfono Ventas:</p>
+                        <p class="text-gray-600">(02901) 406-206</p>
+                        <p class="mt-3 text-gray-700 font-semibold">Email Ventas:</p>
+                        <p class="text-gray-600"><a href="mailto:durplass.compras@gmail.com" class="text-accent-blue hover:underline">durplass.compras@gmail.com</a></p>
                     </div>
                 </div>
             </div>
@@ -439,7 +489,6 @@
             }
 
             try {
-                // Recolectar datos del formulario
                 const form = document.getElementById('budget-form');
                 const formData = new FormData(form);
                 const data = Object.fromEntries(formData.entries());
@@ -448,8 +497,8 @@
                 const productCheckboxes = form.querySelectorAll('input[name="productInterest"]:checked');
                 const interests = Array.from(productCheckboxes).map(cb => cb.value);
 
-                // Validaciones básicas de campos
-                if (!data.clientName || !data.clientEmail || !data.projectType || !data.description || interests.length === 0) {
+                // Validaciones de campos obligatorios
+                if (!data.clientName || !data.clientEmail || !data.clientPhone || !data.projectProvince || !data.projectCity || !data.projectType || !data.installationNeeded || interests.length === 0) {
                     window.showMessage('Por favor, completa todos los campos obligatorios (*) y selecciona al menos un producto.', 'bg-yellow-500');
                     submitButton.disabled = false;
                     submitButton.textContent = 'Enviar Solicitud de Presupuesto';
@@ -460,18 +509,23 @@
                 const budgetRequest = {
                     clientName: data.clientName,
                     clientEmail: data.clientEmail,
-                    clientPhone: data.clientPhone || 'No proporcionado',
+                    clientPhone: data.clientPhone,
+                    clientCompany: data.clientCompany || 'Particular',
+                    projectProvince: data.projectProvince,
+                    projectCity: data.projectCity,
                     projectType: data.projectType,
+                    installationNeeded: data.installationNeeded === 'si' ? true : false,
                     productInterest: interests,
-                    description: data.description,
+                    pvcDetails: data.pvcDetails || 'No se especificaron detalles para PVC.',
+                    chapaDetails: data.chapaDetails || 'No se especificaron detalles para Chapa.',
+                    additionalNotes: data.additionalNotes || 'Sin notas adicionales.',
                     submissionDate: new Date().toISOString(),
-                    userId: userId // Registrar quién envió la solicitud
+                    userId: userId 
                 };
 
                 // Ruta de la colección: /artifacts/{appId}/public/data/budget_requests
                 const collectionPath = `artifacts/${appId}/public/data/budget_requests`;
                 
-                // Agregar el documento a Firestore
                 const docRef = await addDoc(collection(db, collectionPath), budgetRequest);
 
                 window.showMessage('¡Tu solicitud de presupuesto fue enviada con éxito! Nos contactaremos pronto.', 'bg-green-500');
@@ -492,7 +546,7 @@
         window.addEventListener('load', initializeFirebase);
     </script>
 
-    <!-- Scripts de Interfaz -->
+    <!-- Scripts de Interfaz (Funcionalidad de Vistas y Menú) -->
     <script>
         // Función para mostrar mensajes de estado (éxito/error/alerta)
         window.showMessage = function(message, className) {
@@ -512,25 +566,22 @@
             }, 5000);
         }
 
-        // Manejo de la navegación de vistas (CORRECCIÓN IMPLEMENTADA AQUÍ)
+        // Manejo de la navegación de vistas
         function showView(viewId) {
-            // Obtener todas las secciones que deben ser ocultadas/mostradas
             const views = document.querySelectorAll('.content-section');
             
-            // Ocultar todas las secciones de contenido
             views.forEach(view => {
                 view.style.display = 'none'; 
             });
             
-            // La sección 'inicio' no tiene 'content-section', se maneja por separado si es necesario.
             const targetView = document.getElementById(viewId);
             const homeView = document.getElementById('inicio');
 
             if (viewId === 'inicio') {
                 if (homeView) homeView.style.display = 'block';
             } else if (targetView) {
-                if (homeView) homeView.style.display = 'none'; // Ocultar inicio si vamos a otra sección
-                targetView.style.display = 'block'; // Mostrar la vista solicitada
+                if (homeView) homeView.style.display = 'none'; 
+                targetView.style.display = 'block'; 
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
                 console.warn(`View with ID ${viewId} not found.`);
@@ -556,8 +607,6 @@
             });
         });
 
-        // Asignar el listener al formulario de presupuesto
-        document.getElementById('budget-form').addEventListener('submit', window.submitBudgetRequest);
     </script>
 </body>
 </html>
